@@ -1,0 +1,24 @@
+:root {
+  --header-height: 40px;
+}
+
+@font-face {
+  font-family: 'BruceForever';
+  src: url('assets/fonts/BruceForeverRegular.ttf') format('truetype');
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  background-image: url(assets/bg.jpg);
+  background-position: center;
+  background-size: contain;
+  min-height: 100dvh;
+  font-family: BruceForever;
+  color: #fff;
+}
+
+a {
+  text-decoration: none;
+  color: #fff;
+}

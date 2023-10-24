@@ -1,12 +1,13 @@
 import { CommonFireStoreDocument } from './common-firesotre.interface';
 
 export interface VoteItem {
-  criteriaId: string;
+  questionId: string;
+  questionText: string;
   point: number;
 }
 
-export interface VoteResult extends CommonFireStoreDocument {
+export interface Result extends CommonFireStoreDocument {
   personId: string;
-  voteResults: VoteResult[];
+  voteResults: VoteItem[];
   note: string;
 }
