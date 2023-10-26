@@ -1,5 +1,9 @@
 :root {
   --header-height: 40px;
+  --footer-height: 40px;
+
+  --primary-color: #5996d0;
+  --secondary-color: #b652a1;
 }
 
 @font-face {
@@ -16,6 +20,7 @@ body {
   min-height: 100dvh;
   font-family: BruceForever;
   color: #fff;
+  overflow: hidden;
 }
 
 a {

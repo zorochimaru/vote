@@ -1,0 +1,36 @@
+.charContainer {
+  width: 120px;
+  height: 150px;
+  cursor: pointer;
+  position: relative;
+  background-color: var(--primary-color);
+  clip-path: polygon(25% 0%, 100% 0%, 75% 100%, 0% 100%);
+  transition: transform 0.3s ease-in-out;
+  margin-bottom: 40px;
+}
+
+.isActive {
+  transform: scale(1.2);
+}
+
+.charContainer img {
+  width: 100%;
+}
+
+.charContainer:hover {
+  transform: scale(1.3);
+}
+
+.orderNumber {
+  position: absolute;
+  bottom: 4px;
+  font-size: 30px;
+  left: 10px;
+  padding: 5px 10px;
+  border-radius: 8px;
+  background-color: rgba(0, 0, 0, 0.5);
+}
+
+.rated {
+  filter: grayscale(1);
+}

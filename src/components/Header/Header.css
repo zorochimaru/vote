@@ -1,0 +1,26 @@
+header {
+  padding: 16px 32px;
+  height: var(--header-height);
+  background-color: rgba(120, 120, 120, 0.1);
+  display: flex;
+  align-items: center;
+}
+nav {
+  flex: 1;
+  display: flex;
+  align-items: center;
+}
+
+.logo {
+  flex: 1;
+}
+
+.logo img {
+  height: 40px;
+}
+
+ul {
+  list-style: none;
+  display: flex;
+  gap: 8px;
+}

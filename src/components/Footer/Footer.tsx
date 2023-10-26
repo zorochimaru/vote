@@ -1,3 +1,5 @@
+import './Footer.css';
+
 const Footer = () => {
   return <footer>©️ me 2023</footer>;
 };
