@@ -1,6 +1,4 @@
-import { addDoc, collection } from 'firebase/firestore';
 import { useState } from 'react';
-import { db } from '../../../firebase';
 import CharachterPick from '../../components/UI/CharachterPick/CharachterPick';
 import { Character } from '../../interfaces';
 import classes from './home.module.css';
@@ -18,21 +16,10 @@ const mockData = new Array(50).fill({
   rated: false
 });
 const Home = () => {
-  const [charachters, setCharachters] = useState<Character[]>(mockData);
-  const [selectedCharachter, setSelectedCharachter] = useState<Character>(mockData[0]);
+  const [charachters] = useState<Character[]>(mockData);
+  const [selectedCharachter] = useState<Character>(mockData[0]);
 
   const isActiveCharacter = (id: string): boolean => selectedCharachter.id === id;
-
-  const onSave = async () => {
-    try {
-      const docRef = await addDoc(collection(db, 'todos'), {
-        test: 'test'
-      });
-      console.log('Document written with ID: ', docRef.id);
-    } catch (e) {
-      console.error('Error adding document: ', e);
-    }
-  };
 
   return (
     <div className={classes.wrapper}>

@@ -4,6 +4,10 @@
   height: calc(100dvh - 156px);
 }
 
+h2 {
+  margin-top: 0;
+}
+
 .descWrapper {
   display: flex;
 }
