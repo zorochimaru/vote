@@ -11,7 +11,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-      - run: npm i
+      - name: Install dependencies
+        run: npm i
+        env:
+          VITE_INTERNAL: true
       - run: npm run build
       - uses: FirebaseExtended/action-hosting-deploy@v0
         with:
