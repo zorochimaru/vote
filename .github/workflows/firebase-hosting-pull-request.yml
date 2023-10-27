@@ -7,19 +7,19 @@ jobs:
   build_and_preview:
     if: '${{ github.event.pull_request.head.repo.full_name == github.repository }}'
     runs-on: ubuntu-latest
+    env:
+      VITE_FIREBASECONFIG_API_KEY: ${{ secrets.FIREBASECONFIG_API_KEY }}
+      VITE_FIREBASECONFIG_AUTH_DOMAIN: ${{ secrets.FIREBASECONFIG_AUTH_DOMAIN }}
+      VITE_FIREBASECONFIG_PROJECT_ID: ${{ secrets.FIREBASECONFIG_PROJECT_ID }}
+      VITE_FIREBASECONFIG_STORAGE_BUCKET: ${{ secrets.FIREBASECONFIG_STORAGE_BUCKET }}
+      VITE_FIREBASECONFIG_MESSAGING_SENDER_ID: ${{ secrets.FIREBASECONFIG_MESSAGING_SENDER_ID }}
+      VITE_FIREBASECONFIG_APP_ID: ${{ secrets.FIREBASECONFIG_APP_ID }}
     steps:
       - uses: actions/checkout@v3
       - name: Install dependencies
         run: npm i
       - run: npm run build
       - uses: FirebaseExtended/action-hosting-deploy@v0
-        env:
-          VITE_FIREBASECONFIG_API_KEY: '${{ secrets.FIREBASECONFIG_API_KEY }}'
-          VITE_FIREBASECONFIG_AUTH_DOMAIN: '${{ secrets.FIREBASECONFIG_AUTH_DOMAIN }}'
-          VITE_FIREBASECONFIG_PROJECT_ID: '${{ secrets.FIREBASECONFIG_PROJECT_ID }}'
-          VITE_FIREBASECONFIG_STORAGE_BUCKET: '${{ secrets.FIREBASECONFIG_STORAGE_BUCKET }}'
-          VITE_FIREBASECONFIG_MESSAGING_SENDER_ID: '${{ secrets.FIREBASECONFIG_MESSAGING_SENDER_ID }}'
-          VITE_FIREBASECONFIG_APP_ID: '${{ secrets.FIREBASECONFIG_APP_ID }}'
         with:
           repoToken: '${{ secrets.GITHUB_TOKEN }}'
           firebaseServiceAccount: '${{ secrets.FIREBASE_SERVICE_ACCOUNT_VOTE_47A25 }}'
