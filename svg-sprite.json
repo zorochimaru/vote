@@ -1,0 +1,21 @@
+{
+  "dest": "./public",
+  "mode": {
+    "symbol": {
+      "dest": ".",
+      "sprite": "sprite.svg"
+    }
+  },
+  "svg": {
+    "xmlDeclaration": false
+  },
+  "shape": {
+    "transform": [
+      {
+        "svgo": {
+          "plugins": ["removeRasterImages", "removeXMLNS"]
+        }
+      }
+    ]
+  }
+}

@@ -1,3 +1,4 @@
+import { Rating } from '@mui/material';
 import { useState } from 'react';
 import CharachterPick from '../../components/UI/CharachterPick/CharachterPick';
 import { Character } from '../../interfaces';
@@ -18,7 +19,7 @@ const mockData = new Array(50).fill({
 const Home = () => {
   const [charachters] = useState<Character[]>(mockData);
   const [selectedCharachter] = useState<Character>(mockData[0]);
-
+  const [value, setValue] = useState<number | null>(2);
   const isActiveCharacter = (id: string): boolean => selectedCharachter.id === id;
 
   return (
@@ -29,35 +30,27 @@ const Home = () => {
           <div className={classes.questionsWrapper}>
             <div className={classes.row}>
               <div className={classes.column}>Costume</div>
-              <div className={classes.column}>☼ ☼ ☼ ☼ ☼</div>
+              <div className={classes.column}>
+                <Rating
+                  name="simple-controlled"
+                  value={value}
+                  onChange={(event, newValue) => {
+                    setValue(newValue);
+                  }}
+                />
+              </div>
             </div>
             <div className={classes.row}>
-              <div className={classes.column}>Costume</div>
-              <div className={classes.column}>☼ ☼ ☼ ☼ ☼</div>
-            </div>
-            <div className={classes.row}>
-              <div className={classes.column}>Costume</div>
-              <div className={classes.column}>☼ ☼ ☼ ☼ ☼</div>
-            </div>
-            <div className={classes.row}>
-              <div className={classes.column}>Costume</div>
-              <div className={classes.column}>☼ ☼ ☼ ☼ ☼</div>
-            </div>
-            <div className={classes.row}>
-              <div className={classes.column}>Costume</div>
-              <div className={classes.column}>☼ ☼ ☼ ☼ ☼</div>
-            </div>
-            <div className={classes.row}>
-              <div className={classes.column}>Costume</div>
-              <div className={classes.column}>☼ ☼ ☼ ☼ ☼</div>
-            </div>
-            <div className={classes.row}>
-              <div className={classes.column}>Costume</div>
-              <div className={classes.column}>☼ ☼ ☼ ☼ ☼</div>
-            </div>
-            <div className={classes.row}>
-              <div className={classes.column}>Costume</div>
-              <div className={classes.column}>☼ ☼ ☼ ☼ ☼</div>
+              <div className={classes.column}>Role play</div>
+              <div className={classes.column}>
+                <Rating
+                  name="simple-controlled"
+                  value={value}
+                  onChange={(event, newValue) => {
+                    setValue(newValue);
+                  }}
+                />
+              </div>
             </div>
           </div>
 
@@ -97,7 +90,11 @@ const Home = () => {
 
       <div className={classes.charsWrapper}>
         {charachters.map((charachter) => (
-          <CharachterPick isActive={isActiveCharacter(charachter.id)} charachter={charachter} />
+          <CharachterPick
+            key={charachter.id}
+            isActive={isActiveCharacter(charachter.id)}
+            charachter={charachter}
+          />
         ))}
       </div>
     </div>
