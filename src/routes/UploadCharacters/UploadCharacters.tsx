@@ -9,13 +9,16 @@ import TableContainer from '@mui/material/TableContainer';
 import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import { addDoc, collection, serverTimestamp } from 'firebase/firestore';
-import { useState } from 'react';
+import PropTypes from 'prop-types';
+import { FC, useState } from 'react';
 import * as XLSX from 'xlsx';
 import { firestore } from '../../../firebase';
+
+import { Character } from '../../interfaces';
 import classes from './upload-characters.module.css';
 
 const UploadCharacters = () => {
-  const [rows, setRows] = useState<any[]>([]);
+  const [rows, setRows] = useState<Character[]>([]);
 
   const loadFile = (event: React.ChangeEvent<HTMLInputElement>) => {
     const f = event.target.files?.[0];
@@ -29,7 +32,7 @@ const UploadCharacters = () => {
       const wsname = wb.SheetNames[0];
       const ws = wb.Sheets[wsname];
       /* Convert array of arrays */
-      const data = XLSX.utils.sheet_to_json(ws) as any[];
+      const data = XLSX.utils.sheet_to_json(ws) as Character[];
       /* Update state */
       setRows(data);
     };
@@ -99,7 +102,9 @@ const UploadCharacters = () => {
             </TableHead>
             <TableBody>
               {rows.map((row) => (
-                <TableRow key={row.name} sx={{ '&:last-child td, &:last-child th': { border: 0 } }}>
+                <TableRow
+                  key={row.orderNumber}
+                  sx={{ '&:last-child td, &:last-child th': { border: 0 } }}>
                   <TableCell component="th" scope="row">
                     {row.name}
                   </TableCell>
@@ -120,7 +125,8 @@ const UploadCharacters = () => {
   );
 };
 
-const CharImage: React.FC<{ row: any }> = ({ row }) => {
+type Props = PropTypes.InferProps<{ row: Character }>;
+const CharImage: FC<Props> = ({ row }) => {
   const [anchorEl, setAnchorEl] = useState<HTMLButtonElement | null>(null);
 
   const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {

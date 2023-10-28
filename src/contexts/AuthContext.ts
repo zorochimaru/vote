@@ -1,9 +1,9 @@
-import { User } from 'firebase/auth';
-import { createContext, Dispatch, useContext } from 'react';
+import { UserCredential } from 'firebase/auth';
+import { Dispatch, createContext, useContext } from 'react';
 
 export type UserFactory = {
-  user: User | null;
-  setUser: Dispatch<any>;
+  user: UserCredential | null;
+  setUser: Dispatch<UserCredential>;
 };
 
 export const UserContext = createContext<UserFactory>({

@@ -13,7 +13,10 @@ const Login = () => {
   const { user, setUser } = useUser();
 
   useEffect(() => {
-    setUser(authUser);
+    if (authUser) {
+      setUser(authUser);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [authUser]);
 
   if (error) {

@@ -1,17 +1,17 @@
+import { lazy, useMemo, useState } from 'react';
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
-
-import { useMemo, useState } from 'react';
 import { UserContext, UserFactory } from './contexts/AuthContext';
-
 import { AuthGuard } from './hoc/AuthGuard';
 import Layout from './hoc/Layout';
 
 import { ThemeProvider, createTheme } from '@mui/material/styles';
-import Home from './routes/Home/Home';
-import Login from './routes/Login/Login';
-import Profile from './routes/Profile/Profile';
-import ProfileList from './routes/ProfileList/ProfileList';
-import UploadCharacters from './routes/UploadCharacters/UploadCharacters';
+import { User } from 'firebase/auth';
+
+const Home = lazy(() => import('./routes/Home/Home'));
+const Login = lazy(() => import('./routes/Login/Login'));
+const Profile = lazy(() => import('./routes/Profile/Profile'));
+const ProfileList = lazy(() => import('./routes/ProfileList/ProfileList'));
+const UploadCharacters = lazy(() => import('./routes/UploadCharacters/UploadCharacters'));
 
 const darkTheme = createTheme({
   palette: {
@@ -20,7 +20,7 @@ const darkTheme = createTheme({
 });
 
 export const App = () => {
-  const [user, setUser] = useState<any>(null);
+  const [user, setUser] = useState<User | null>(null);
   const userFactory = useMemo<UserFactory>(() => ({ user, setUser }), [user, setUser]);
 
   return (

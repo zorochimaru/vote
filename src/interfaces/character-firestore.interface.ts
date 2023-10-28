@@ -1,4 +1,6 @@
-export interface Character {
+import { CommonFireStoreDocument } from './common-firesotre.interface';
+
+export interface CharacterFirestore extends CommonFireStoreDocument {
   orderNumber: number;
   name: string;
   fandom: string;
