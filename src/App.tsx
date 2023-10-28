@@ -5,7 +5,7 @@ import { AuthGuard } from './hoc/AuthGuard';
 import Layout from './hoc/Layout';
 
 import { ThemeProvider, createTheme } from '@mui/material/styles';
-import { User } from 'firebase/auth';
+import { UserCredential } from 'firebase/auth';
 
 const Home = lazy(() => import('./routes/Home/Home'));
 const Login = lazy(() => import('./routes/Login/Login'));
@@ -20,7 +20,7 @@ const darkTheme = createTheme({
 });
 
 export const App = () => {
-  const [user, setUser] = useState<User | null>(null);
+  const [user, setUser] = useState<UserCredential | null>(null);
   const userFactory = useMemo<UserFactory>(() => ({ user, setUser }), [user, setUser]);
 
   return (

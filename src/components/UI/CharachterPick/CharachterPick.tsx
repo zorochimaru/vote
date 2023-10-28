@@ -7,12 +7,9 @@ const CharachterPick: FC<{ isActive?: boolean; charachter: Character }> = ({
   charachter
 }) => {
   return (
-    <div
-      className={`${classes.charContainer} ${isActive && classes.isActive} ${
-        charachter.rated && classes.rated
-      }`}>
+    <div className={`${classes.charContainer} ${isActive && classes.isActive} ${classes.rated}`}>
       <span className={classes.orderNumber}>{charachter.orderNumber}</span>
-      <img src={charachter.imgSrc} alt={charachter.name} />
+      <img src={charachter.image} alt={charachter.characterName} />
     </div>
   );
 };

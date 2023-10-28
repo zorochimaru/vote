@@ -20,7 +20,8 @@ const Home = () => {
   const [charachters] = useState<Character[]>(mockData);
   const [selectedCharachter] = useState<Character>(mockData[0]);
   const [value, setValue] = useState<number | null>(2);
-  const isActiveCharacter = (id: string): boolean => selectedCharachter.id === id;
+  const isActiveCharacter = (orderNumber: number): boolean =>
+    selectedCharachter.orderNumber === orderNumber;
 
   return (
     <div className={classes.wrapper}>
@@ -59,7 +60,7 @@ const Home = () => {
           </button>
         </div>
         <div className={classes.avatar}>
-          <img src={selectedCharachter.imgSrc} alt={selectedCharachter.name} />
+          <img src={selectedCharachter.image} alt={selectedCharachter.name} />
         </div>
         <div className={classes.info}>
           <h2>Description</h2>
@@ -91,8 +92,8 @@ const Home = () => {
       <div className={classes.charsWrapper}>
         {charachters.map((charachter) => (
           <CharachterPick
-            key={charachter.id}
-            isActive={isActiveCharacter(charachter.id)}
+            key={charachter.orderNumber}
+            isActive={isActiveCharacter(charachter.orderNumber)}
             charachter={charachter}
           />
         ))}
