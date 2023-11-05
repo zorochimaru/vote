@@ -1,12 +1,17 @@
 import { Rating } from '@mui/material';
-import { FunctionComponent, useState } from 'react';
-import classes from '../home.module.css';
+import { FunctionComponent, useEffect, useState } from 'react';
+import classes from '../solo-cosplay-vote.module.css';
 
 const CriteriaList: FunctionComponent<{
   label: string;
+  value: number;
   onChange: (value: number) => void;
-}> = ({ label, onChange }) => {
-  const [value, setValue] = useState<number | null>(0);
+}> = ({ label, onChange, value }) => {
+  const [rate, setRate] = useState<number | null>(value);
+
+  useEffect(() => {
+    setRate(value);
+  }, [value]);
 
   return (
     <div className={classes.row}>
@@ -14,9 +19,9 @@ const CriteriaList: FunctionComponent<{
       <div className={classes.column}>
         <Rating
           name="rating"
-          value={value}
+          value={rate}
           onChange={(_event, newValue) => {
-            setValue(newValue);
+            setRate(newValue);
             onChange(newValue || 0);
           }}
         />

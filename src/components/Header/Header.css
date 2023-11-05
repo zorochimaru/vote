@@ -22,5 +22,14 @@ nav {
 ul {
   list-style: none;
   display: flex;
-  gap: 8px;
+  gap: 32px;
+}
+
+button {
+  border: none;
+  background-color: transparent;
+  color: #fff;
+  font-family: BruceForever;
+  font-size: 16px;
+  cursor: pointer;
 }

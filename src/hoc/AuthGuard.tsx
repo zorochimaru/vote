@@ -4,7 +4,8 @@ import { useUser } from '../contexts/AuthContext';
 
 export const AuthGuard: FC<PropsWithChildren> = () => {
   const { user } = useUser();
-  if (!user && import.meta.env.PROD) {
+
+  if (!user) {
     return <Navigate to="/login" replace />;
   }
 

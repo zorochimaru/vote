@@ -13,7 +13,7 @@ const Layout = () => {
     auth.onAuthStateChanged((user) => {
       if (user) {
         console.log(`Auth state changed. Loged In`);
-        localStorage.setItem('user', 'true');
+        localStorage.setItem('user', JSON.stringify(user.uid));
       } else {
         console.log(`Auth state changed. Loged Out`);
         setUser(null);

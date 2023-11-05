@@ -1,3 +1,4 @@
+export * from './auth-user.interface';
 export * from './basic-lib-firestore.interface';
 export * from './character-firestore.interface';
 export * from './character.interface';

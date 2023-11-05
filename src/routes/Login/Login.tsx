@@ -1,9 +1,12 @@
 import { signInWithEmailAndPassword } from '@firebase/auth';
+import { doc } from 'firebase/firestore';
 import { useState } from 'react';
 import { Navigate } from 'react-router-dom';
-import { auth } from '../../../firebase';
+import { auth, firestore } from '../../../firebase';
 import { useUser } from '../../contexts/AuthContext';
+import { getDocument } from '../../services/firestore.service';
 import classes from './login.module.css';
+import { AuthUser } from '../../interfaces';
 
 const Login = () => {
   const [email, setEmail] = useState('');
@@ -13,7 +16,10 @@ const Login = () => {
   const signIn = async (email: string, password: string) => {
     try {
       const logedUser = await signInWithEmailAndPassword(auth, email, password);
-      setUser(logedUser.user);
+      const authUser = await getDocument<AuthUser>(
+        doc(firestore, `authUsers/${logedUser.user.uid}`)
+      );
+      setUser(authUser);
     } catch (error) {
       console.error(error);
     }

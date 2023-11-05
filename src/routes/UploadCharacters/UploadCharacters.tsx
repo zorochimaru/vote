@@ -47,7 +47,7 @@ const UploadCharacters = () => {
       reqs.push(
         addDoc(soloCosplayPersonsCollectionRef, {
           createdAt: serverTimestamp(),
-          createdBy: user?.uid,
+          createdBy: user?.id,
           ...row
         })
       );
