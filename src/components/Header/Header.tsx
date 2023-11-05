@@ -1,7 +1,13 @@
+import { signOut } from 'firebase/auth';
 import { Link } from 'react-router-dom';
+import { auth } from '../../../firebase';
 import './Header.css';
 
 const Header = () => {
+  const logout = () => {
+    signOut(auth).then(() => {});
+  };
+
   return (
     <header>
       <nav>
@@ -14,6 +20,9 @@ const Header = () => {
           </li>
           <li>
             <Link to="/about">About</Link>
+          </li>
+          <li>
+            <button onClick={logout}>Logout</button>
           </li>
         </ul>
       </nav>

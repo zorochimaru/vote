@@ -1,5 +1,5 @@
-import { useEffect, useState } from 'react';
-import { useSignInWithEmailAndPassword } from 'react-firebase-hooks/auth';
+import { signInWithEmailAndPassword } from '@firebase/auth';
+import { useState } from 'react';
 import { Navigate } from 'react-router-dom';
 import { auth } from '../../../firebase';
 import { useUser } from '../../contexts/AuthContext';
@@ -8,23 +8,17 @@ import classes from './login.module.css';
 const Login = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [signInWithEmailAndPassword, authUser, loading, error] =
-    useSignInWithEmailAndPassword(auth);
   const { user, setUser } = useUser();
 
-  useEffect(() => {
-    if (authUser) {
-      setUser(authUser);
+  const signIn = async (email: string, password: string) => {
+    try {
+      const logedUser = await signInWithEmailAndPassword(auth, email, password);
+      setUser(logedUser.user);
+    } catch (error) {
+      console.error(error);
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [authUser]);
+  };
 
-  if (error) {
-    return <p>Error: {error.message}</p>;
-  }
-  if (loading) {
-    return <img className={classes.loadingLogo} src="gs.logo.white-mini.png" alt="logo" />;
-  }
   if (user) {
     return <Navigate to="/" replace={true} />;
   }
@@ -33,7 +27,7 @@ const Login = () => {
       className={classes.loginForm}
       onSubmit={(e) => {
         e.preventDefault();
-        signInWithEmailAndPassword(email, password);
+        signIn(email, password);
       }}>
       <h1>Login</h1>
       <input

@@ -8,18 +8,19 @@ import TableCell from '@mui/material/TableCell';
 import TableContainer from '@mui/material/TableContainer';
 import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
-import { addDoc, collection, serverTimestamp } from 'firebase/firestore';
 import PropTypes from 'prop-types';
 import { FC, useState } from 'react';
 import * as XLSX from 'xlsx';
-import { firestore } from '../../../firebase';
 
+import { addDoc, serverTimestamp } from 'firebase/firestore';
+import { soloCosplayPersonsCollectionRef } from '../../../firebase';
+import { useUser } from '../../contexts/AuthContext';
 import { Character } from '../../interfaces';
 import classes from './upload-characters.module.css';
 
 const UploadCharacters = () => {
   const [rows, setRows] = useState<Character[]>([]);
-
+  const { user } = useUser();
   const loadFile = (event: React.ChangeEvent<HTMLInputElement>) => {
     const f = event.target.files?.[0];
     if (!f) return;
@@ -32,9 +33,10 @@ const UploadCharacters = () => {
       const wsname = wb.SheetNames[0];
       const ws = wb.Sheets[wsname];
       /* Convert array of arrays */
-      const data = XLSX.utils.sheet_to_json(ws) as Character[];
+      const data = XLSX.utils.sheet_to_json(ws, { defval: '' }) as Character[];
       /* Update state */
-      setRows(data);
+      const finalResult: Character[] = data.map((x, i) => ({ ...x, orderNumber: i + 1 }));
+      setRows(finalResult);
     };
     reader.readAsBinaryString(f);
   };
@@ -43,9 +45,9 @@ const UploadCharacters = () => {
     const reqs = [];
     for (const row of rows) {
       reqs.push(
-        addDoc(collection(firestore, 'soloCosplay'), {
+        addDoc(soloCosplayPersonsCollectionRef, {
           createdAt: serverTimestamp(),
-          createdBy: 'Loged User Id',
+          createdBy: user?.uid,
           ...row
         })
       );
@@ -114,7 +116,7 @@ const UploadCharacters = () => {
                   <TableCell align="right">
                     <CharImage row={row} />
                   </TableCell>
-                  <TableCell align="right">{row.selfMade}</TableCell>
+                  <TableCell align="right">{row.selfMade ? 'Yes' : 'No'}</TableCell>
                 </TableRow>
               ))}
             </TableBody>

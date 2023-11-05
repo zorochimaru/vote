@@ -7,6 +7,8 @@
   clip-path: polygon(25% 0%, 100% 0%, 75% 100%, 0% 100%);
   transition: transform 0.3s ease-in-out;
   margin-bottom: 40px;
+  padding-inline: 0;
+  border: 0;
 }
 
 .isActive {

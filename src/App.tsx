@@ -1,11 +1,12 @@
-import { lazy, useMemo, useState } from 'react';
+import { Suspense, lazy, useMemo, useState } from 'react';
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
 import { UserContext, UserFactory } from './contexts/AuthContext';
 import { AuthGuard } from './hoc/AuthGuard';
 import Layout from './hoc/Layout';
 
+import { User } from '@firebase/auth';
 import { ThemeProvider, createTheme } from '@mui/material/styles';
-import { UserCredential } from 'firebase/auth';
+import Loading from './components/Loading/Loading';
 
 const Home = lazy(() => import('./routes/Home/Home'));
 const Login = lazy(() => import('./routes/Login/Login'));
@@ -20,27 +21,31 @@ const darkTheme = createTheme({
 });
 
 export const App = () => {
-  const [user, setUser] = useState<UserCredential | null>(null);
+  const [user, setUser] = useState<User | null>(
+    localStorage.getItem('user') ? JSON.parse(localStorage.getItem('user')!) : null
+  );
   const userFactory = useMemo<UserFactory>(() => ({ user, setUser }), [user, setUser]);
 
   return (
     <ThemeProvider theme={darkTheme}>
       <UserContext.Provider value={userFactory}>
-        <BrowserRouter>
-          <Routes>
-            <Route path="login" element={<Login />} />
-            <Route element={<AuthGuard />}>
-              <Route element={<Layout />}>
-                <Route index element={<Home />} />
-                <Route path="profiles" element={<ProfileList />} />
-                <Route path="upload-characters" element={<UploadCharacters />} />
-                <Route path="profiles/*" element={<Profile />} />
-                <Route path="about/*" element={<div>About</div>} />
-                <Route path="*" element={<div>404</div>} />
+        <Suspense fallback={<Loading />}>
+          <BrowserRouter>
+            <Routes>
+              <Route path="login" element={<Login />} />
+              <Route element={<AuthGuard />}>
+                <Route element={<Layout />}>
+                  <Route index element={<Home />} />
+                  <Route path="profiles" element={<ProfileList />} />
+                  <Route path="upload-characters" element={<UploadCharacters />} />
+                  <Route path="profiles/*" element={<Profile />} />
+                  <Route path="about/*" element={<div>About</div>} />
+                  <Route path="*" element={<div>404</div>} />
+                </Route>
               </Route>
-            </Route>
-          </Routes>
-        </BrowserRouter>
+            </Routes>
+          </BrowserRouter>
+        </Suspense>
       </UserContext.Provider>
     </ThemeProvider>
   );

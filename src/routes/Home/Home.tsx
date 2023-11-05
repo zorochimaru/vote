@@ -1,27 +1,71 @@
-import { Rating } from '@mui/material';
-import { useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
+import {
+  soloCosplayCriteriaCollectionRef,
+  soloCosplayPersonsCollectionRef,
+  soloCosplayResultsCollectionRef
+} from '../../../firebase';
 import CharachterPick from '../../components/UI/CharachterPick/CharachterPick';
-import { Character } from '../../interfaces';
+import { useUser } from '../../contexts/AuthContext';
+import { BasicLibFirestore, CharacterFirestore, Rate, Result } from '../../interfaces';
+import { getList } from '../../services/firestore.service';
+import CriteriaList from './components/CriteriaList';
+import InfoRow from './components/InfoRow';
 import classes from './home.module.css';
-const mockData = new Array(50).fill({
-  createdAt: '2023-10-26T14:37:43.967Z',
-  createdBy: 'Anonymous',
-  orderNumber: 10,
-  description: 'Something',
-  id: '123',
-  imgSrc: 'https://upload.wikimedia.org/wikipedia/en/a/a4/Roronoa_Zoro.jpg',
-  name: 'Anonymous',
-  realName: 'Anonymous',
-  updatedAt: '2023-10-26T14:37:43.967Z',
-  updatedBy: 'Anonymous',
-  rated: false
-});
+import { addDoc, serverTimestamp } from 'firebase/firestore';
+
 const Home = () => {
-  const [charachters] = useState<Character[]>(mockData);
-  const [selectedCharachter] = useState<Character>(mockData[0]);
-  const [value, setValue] = useState<number | null>(2);
-  const isActiveCharacter = (orderNumber: number): boolean =>
-    selectedCharachter.orderNumber === orderNumber;
+  const [selectedCharachter, setSelectedCharachter] = useState<CharacterFirestore | null>(null);
+  const [soloCosplayCriteria, setSoloCosplayCriteria] = useState<BasicLibFirestore[]>([]);
+  const { user } = useUser();
+  const [characters, setCharacters] = useState<CharacterFirestore[]>([]);
+  const [rates, setRates] = useState<Map<string, Rate>>(new Map());
+
+  const isActiveCharacter = (id: string): boolean => {
+    return selectedCharachter?.id === id;
+  };
+
+  const fetchChars = useCallback(async () => {
+    try {
+      const chars = await getList<CharacterFirestore>(soloCosplayPersonsCollectionRef);
+      setCharacters(chars);
+    } catch (error) {
+      console.error(error);
+    }
+  }, []);
+
+  const fetchCriteria = useCallback(async () => {
+    try {
+      const criteria = await getList<BasicLibFirestore>(soloCosplayCriteriaCollectionRef);
+      setSoloCosplayCriteria(criteria);
+    } catch (error) {
+      console.error(error);
+    }
+  }, []);
+
+  useEffect(() => {
+    fetchChars();
+    fetchCriteria();
+  }, [fetchChars, fetchCriteria]);
+
+  const patchResults = (criteriaId: string, value: number) => {
+    setRates(new Map<string, Rate>(rates.set(criteriaId, { criteriaId, value })));
+  };
+
+  const submitHandler = async () => {
+    if (selectedCharachter) {
+      const results: Result = {
+        personId: selectedCharachter.id,
+        results: [...rates.keys()].map((k) => rates.get(k)!)
+      };
+      await addDoc(soloCosplayResultsCollectionRef, {
+        createdAt: serverTimestamp(),
+        createdBy: user?.uid,
+        ...results
+      });
+    } else {
+      alert('Select character!');
+    }
+  };
 
   return (
     <div className={classes.wrapper}>
@@ -29,71 +73,39 @@ const Home = () => {
         <div className={classes.rating}>
           <h2>Rating</h2>
           <div className={classes.questionsWrapper}>
-            <div className={classes.row}>
-              <div className={classes.column}>Costume</div>
-              <div className={classes.column}>
-                <Rating
-                  name="simple-controlled"
-                  value={value}
-                  onChange={(_event, newValue) => {
-                    setValue(newValue);
-                  }}
-                />
-              </div>
-            </div>
-            <div className={classes.row}>
-              <div className={classes.column}>Role play</div>
-              <div className={classes.column}>
-                <Rating
-                  name="simple-controlled"
-                  value={value}
-                  onChange={(_event, newValue) => {
-                    setValue(newValue);
-                  }}
-                />
-              </div>
-            </div>
+            {soloCosplayCriteria.map((criteria) => (
+              <CriteriaList
+                key={criteria.id}
+                label={criteria.label}
+                onChange={(value) => patchResults(criteria.id, value)}
+              />
+            ))}
           </div>
 
-          <button type="button" className={classes.submitBtn}>
+          <button type="button" onClick={submitHandler} className={classes.submitBtn}>
             Submit
           </button>
         </div>
         <div className={classes.avatar}>
-          <img src={selectedCharachter.image} alt={selectedCharachter.name} />
+          <img src={selectedCharachter?.image} alt={selectedCharachter?.name} />
         </div>
         <div className={classes.info}>
           <h2>Description</h2>
-          <div className={classes.row}>
-            <div className={classes.column}>Name</div>
-            <div className={classes.column}>Roronoa Zoro</div>
-          </div>
-          <div className={classes.row}>
-            <div className={classes.column}>Real Name</div>
-            <div className={classes.column}>Rasim Karimli</div>
-          </div>
-          <div className={classes.row}>
-            <div className={classes.column}>Fandom</div>
-            <div className={classes.column}>One Piece</div>
-          </div>
-          <div className={classes.row}>
-            <div className={classes.column}>Note</div>
-            <div className={classes.column}>
-              Далеко-далеко за словесными горами в стране гласных и согласных живут рыбные тексты.
-              Агентство продолжил несколько она жаренные, залетают деревни всемогущая своих.
-              Обеспечивает текстов реторический злых о если семь свою, заманивший они, вдали, по
-              всей подпоясал! Лучше, раз коварных. Жаренные дороге своего, рот сих переписали
-              безорфографичный продолжил жизни, запятых знаках предупредила встретил родного ее?
-            </div>
-          </div>
+          <InfoRow label="Char name" value={selectedCharachter?.characterName || ''} />
+          <InfoRow label="Real Name" value={selectedCharachter?.name || ''} />
+          <InfoRow label="Fandom" value={selectedCharachter?.fandom || ''} />
+          <InfoRow label="Fandom Type" value={selectedCharachter?.fandomType || ''} />
+          <InfoRow label="Self made" value={selectedCharachter?.selfMade || false} />
+          <InfoRow label="Description" value={selectedCharachter?.description || ''} />
         </div>
       </div>
 
       <div className={classes.charsWrapper}>
-        {charachters.map((charachter) => (
+        {characters.map((charachter) => (
           <CharachterPick
-            key={charachter.orderNumber}
-            isActive={isActiveCharacter(charachter.orderNumber)}
+            key={charachter.id}
+            onClick={setSelectedCharachter}
+            isActive={isActiveCharacter(charachter.id)}
             charachter={charachter}
           />
         ))}

@@ -1,16 +1,19 @@
 import { FC } from 'react';
-import { Character } from '../../../interfaces';
+import { CharacterFirestore } from '../../../interfaces';
 import classes from './charachter-pick.module.css';
 
-const CharachterPick: FC<{ isActive?: boolean; charachter: Character }> = ({
-  isActive,
-  charachter
-}) => {
+const CharachterPick: FC<{
+  isActive?: boolean;
+  charachter: CharacterFirestore;
+  onClick: (id: CharacterFirestore) => void;
+}> = ({ isActive, charachter, onClick }) => {
   return (
-    <div className={`${classes.charContainer} ${isActive && classes.isActive} ${classes.rated}`}>
+    <button
+      onClick={() => onClick(charachter)}
+      className={`${classes.charContainer} ${isActive && classes.isActive} ${classes.rated}`}>
       <span className={classes.orderNumber}>{charachter.orderNumber}</span>
       <img src={charachter.image} alt={charachter.characterName} />
-    </div>
+    </button>
   );
 };
 

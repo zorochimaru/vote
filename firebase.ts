@@ -1,6 +1,7 @@
 import { initializeApp } from 'firebase/app';
 import { getAuth } from 'firebase/auth';
-import { getFirestore } from 'firebase/firestore';
+
+import { collection, getFirestore } from 'firebase/firestore';
 
 const firebaseConfig = {
   apiKey: import.meta.env.VITE_FIREBASECONFIG_API_KEY,
@@ -13,6 +14,9 @@ const firebaseConfig = {
 
 const app = initializeApp(firebaseConfig);
 
-export const db = getFirestore(app);
 export const auth = getAuth(app);
 export const firestore = getFirestore(app);
+
+export const soloCosplayPersonsCollectionRef = collection(firestore, `soloCosplayPersons`);
+export const soloCosplayCriteriaCollectionRef = collection(firestore, `soloCosplayCriterias`);
+export const soloCosplayResultsCollectionRef = collection(firestore, `soloCosplayResults`);
