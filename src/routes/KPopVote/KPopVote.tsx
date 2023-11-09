@@ -18,7 +18,11 @@ const KPopVote = () => {
     patchResults,
     showSubmitButton,
     handleSubmit
-  ] = useVote<KpopFirestore>(kPopTeamsCollectionRef, kPopTeamCriteriaCollectionRef);
+  ] = useVote<KpopFirestore>(
+    kPopTeamsCollectionRef,
+    kPopTeamCriteriaCollectionRef,
+    kPopTeamCriteriaCollectionRef
+  );
 
   return (
     <div className={classes.wrapper}>

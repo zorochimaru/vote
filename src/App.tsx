@@ -30,7 +30,7 @@ export const App = () => {
 
   const getUser = useCallback(async (uid: string) => {
     const unsuscribe = onSnapshot(userDocumentRef(uid), (doc) => {
-      setUser(doc.data() as AuthUser);
+      setUser({ ...doc.data(), id: doc.id } as AuthUser);
     });
 
     return () => {

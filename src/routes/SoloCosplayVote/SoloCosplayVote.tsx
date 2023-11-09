@@ -1,6 +1,7 @@
 import {
   soloCosplayCriteriaCollectionRef,
-  soloCosplayPersonsCollectionRef
+  soloCosplayPersonsCollectionRef,
+  soloCosplayResultsCollectionRef
 } from '../../../firebase';
 import CharachterPick from '../../components/CharachterPick/CharachterPick';
 import CriteriaList from '../../components/CriteriaList/CriteriaList';
@@ -23,7 +24,8 @@ const SoloCosplayVote = () => {
     handleSubmit
   ] = useVote<CharacterFirestore>(
     soloCosplayPersonsCollectionRef,
-    soloCosplayCriteriaCollectionRef
+    soloCosplayCriteriaCollectionRef,
+    soloCosplayResultsCollectionRef
   );
 
   return (

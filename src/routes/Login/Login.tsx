@@ -4,9 +4,9 @@ import { useState } from 'react';
 import { Navigate } from 'react-router-dom';
 import { auth, firestore } from '../../../firebase';
 import { useUser } from '../../contexts/AuthContext';
+import { AuthUser } from '../../interfaces';
 import { getDocument } from '../../services/firestore.service';
 import classes from './login.module.css';
-import { AuthUser } from '../../interfaces';
 
 const Login = () => {
   const [email, setEmail] = useState('');

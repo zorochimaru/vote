@@ -8,8 +8,7 @@ import TableCell from '@mui/material/TableCell';
 import TableContainer from '@mui/material/TableContainer';
 import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
-import PropTypes from 'prop-types';
-import { FC, useState } from 'react';
+import { FunctionComponent, useState } from 'react';
 import * as XLSX from 'xlsx';
 
 import {
@@ -27,7 +26,7 @@ import {
   soloCosplayPersonsCollectionRef
 } from '../../../firebase';
 import { useUser } from '../../contexts/AuthContext';
-import { Character, CommonVote } from '../../interfaces';
+import { CommonVote } from '../../interfaces';
 import classes from './upload-characters.module.css';
 
 type VoteTypes = 'soloCosplay' | 'teamCosplay' | 'kPop';
@@ -185,8 +184,7 @@ const UploadCharacters = () => {
   );
 };
 
-type Props = PropTypes.InferProps<{ row: Character }>;
-const CharImage: FC<Props> = ({ row }) => {
+const CharImage: FunctionComponent<{ row: CommonVote }> = ({ row }) => {
   const [anchorEl, setAnchorEl] = useState<HTMLButtonElement | null>(null);
 
   const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
@@ -203,7 +201,7 @@ const CharImage: FC<Props> = ({ row }) => {
   return (
     <>
       <button aria-describedby={id} className={classes.charImage} onClick={handleClick}>
-        <img height={80} src={row.image} alt="" />
+        <img height={80} src={row.image || 'gs.logo.white-mini.png'} alt="" />
       </button>
       <Popover
         id={id}
@@ -218,7 +216,7 @@ const CharImage: FC<Props> = ({ row }) => {
           vertical: 'top',
           horizontal: 'left'
         }}>
-        <img width={300} src={row.image} alt="" />
+        <img width={300} src={row.image || 'gs.logo.white-mini.png'} alt="" />
       </Popover>
     </>
   );

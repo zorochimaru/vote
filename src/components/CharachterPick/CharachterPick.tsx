@@ -19,7 +19,7 @@ const CharachterPick = <T extends CommonVote>({
         rated && classes.rated
       }`}>
       <span className={classes.orderNumber}>{character.orderNumber}</span>
-      <img src={character.image} alt={character.name} />
+      <img src={character?.image || 'gs.logo.white-mini.png'} alt={character.name} />
     </button>
   );
 };

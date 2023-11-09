@@ -1,4 +1,8 @@
-import { cosplayTeamCriteriaCollectionRef, cosplayTeamsCollectionRef } from '../../../firebase';
+import {
+  cosplayTeamCriteriaCollectionRef,
+  cosplayTeamResultsCollectionRef,
+  cosplayTeamsCollectionRef
+} from '../../../firebase';
 import CharachterPick from '../../components/CharachterPick/CharachterPick';
 import CriteriaList from '../../components/CriteriaList/CriteriaList';
 import { useVote } from '../../hooks/useVote';
@@ -17,7 +21,11 @@ const TeamCosplayVote = () => {
     patchResults,
     showSubmitButton,
     handleSubmit
-  ] = useVote<TeamFirestore>(cosplayTeamsCollectionRef, cosplayTeamCriteriaCollectionRef);
+  ] = useVote<TeamFirestore>(
+    cosplayTeamsCollectionRef,
+    cosplayTeamCriteriaCollectionRef,
+    cosplayTeamResultsCollectionRef
+  );
 
   return (
     <div className={classes.wrapper}>
@@ -42,7 +50,10 @@ const TeamCosplayVote = () => {
           )}
         </div>
         <div className={classes.avatar}>
-          <img src={selectedCharachter?.image} alt={selectedCharachter?.name} />
+          <img
+            src={selectedCharachter?.image || 'gs.logo.white-mini.png'}
+            alt={selectedCharachter?.name}
+          />
         </div>
         <div className={classes.info}>
           <h2>Description</h2>

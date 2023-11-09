@@ -1,14 +1,22 @@
-import { CollectionReference, DocumentData, addDoc, serverTimestamp } from 'firebase/firestore';
+import {
+  CollectionReference,
+  DocumentData,
+  addDoc,
+  serverTimestamp,
+  updateDoc
+} from 'firebase/firestore';
 import { useConfirm } from 'material-ui-confirm';
 import { useCallback, useEffect, useState } from 'react';
-import { soloCosplayResultsCollectionRef } from '../../firebase';
+import { useNavigate } from 'react-router-dom';
+import { userDocumentRef } from '../../firebase';
 import { useUser } from '../contexts/AuthContext';
 import { BasicLibFirestore, CommonFirestoreWithOrder, Rate } from '../interfaces';
 import { getList } from '../services/firestore.service';
 
 export const useVote = <T extends CommonFirestoreWithOrder>(
   personsCollectionRef: CollectionReference<DocumentData, DocumentData>,
-  criteriaCollectionRef: CollectionReference<DocumentData, DocumentData>
+  criteriaCollectionRef: CollectionReference<DocumentData, DocumentData>,
+  resultsCollectionRef: CollectionReference<DocumentData, DocumentData>
 ): [
   T[],
   T | undefined,
@@ -23,6 +31,7 @@ export const useVote = <T extends CommonFirestoreWithOrder>(
 ] => {
   const { user } = useUser();
   const confirm = useConfirm();
+  const navigate = useNavigate();
 
   const [selectedCharacter, setSelectedCharachter] = useState<T>();
   const [characters, setCharacters] = useState<T[]>([]);
@@ -87,24 +96,35 @@ export const useVote = <T extends CommonFirestoreWithOrder>(
 
   const saveResults = useCallback(async () => {
     try {
-      const resultRequests = [];
       for (const [personId, results] of [...rateResults.entries()]) {
-        resultRequests.push(
-          addDoc(soloCosplayResultsCollectionRef, {
-            createdAt: serverTimestamp(),
-            createdBy: user?.id,
-            personId,
-            results
-          })
-        );
+        addDoc(resultsCollectionRef, {
+          createdAt: serverTimestamp(),
+          createdBy: user?.id,
+          personId,
+          results
+        });
       }
 
-      await Promise.all(resultRequests);
+      switch (personsCollectionRef.id) {
+        case 'soloCosplayPersons':
+          updateDoc(userDocumentRef(user!.id), { soloCosplayFinished: true });
+          break;
+        case 'cosplayTeam':
+          updateDoc(userDocumentRef(user!.id), { teamCosplayFinished: true });
+          break;
+        case 'kPopTeams':
+          updateDoc(userDocumentRef(user!.id), { kPopFinished: true });
+          break;
+        default:
+          break;
+      }
+
       sessionStorage.removeItem(`${personsCollectionRef.id}`);
+      navigate('/');
     } catch (error) {
       console.error(error);
     }
-  }, [rateResults, user, personsCollectionRef]);
+  }, [rateResults, user, personsCollectionRef, resultsCollectionRef, navigate]);
 
   const patchResults = useCallback(
     (criteriaId: string, value: number) => {

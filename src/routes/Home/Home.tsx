@@ -24,14 +24,6 @@ const Home = () => {
               </div>
             </Link>
           )}
-          {user.soloCosplayFinished && user.teamCosplayFinished && (
-            <Link to="/results">
-              <div className={classes.voteItem}>
-                <Icon size={40} icon="trophy" />
-                <p>Results</p>
-              </div>
-            </Link>
-          )}
         </>
       )}
       {(user?.role === 'k-pop' || user?.role === 'admin') && (
@@ -39,6 +31,14 @@ const Home = () => {
           <div className={classes.voteItem}>
             <Icon size={40} icon="artist" />
             <p>K-Pop Vote</p>
+          </div>
+        </Link>
+      )}
+      {((user?.soloCosplayFinished && user.teamCosplayFinished) || user?.kpopFinished) && (
+        <Link to="/results">
+          <div className={classes.voteItem}>
+            <Icon size={40} icon="trophy" />
+            <p>Results</p>
           </div>
         </Link>
       )}

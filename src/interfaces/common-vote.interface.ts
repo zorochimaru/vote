@@ -1,5 +1,5 @@
 export interface CommonVote {
   orderNumber: number;
-  image: string;
+  image?: string;
   name: string;
 }
