@@ -1,21 +1,23 @@
-import { addDoc, serverTimestamp } from 'firebase/firestore';
+import { CollectionReference, DocumentData, addDoc, serverTimestamp } from 'firebase/firestore';
 import { useConfirm } from 'material-ui-confirm';
 import { useCallback, useEffect, useState } from 'react';
-import {
-  soloCosplayCriteriaCollectionRef,
-  soloCosplayPersonsCollectionRef,
-  soloCosplayResultsCollectionRef
-} from '../../firebase';
+import { soloCosplayResultsCollectionRef } from '../../firebase';
 import { useUser } from '../contexts/AuthContext';
-import { BasicLibFirestore, CharacterFirestore, Rate } from '../interfaces';
+import { BasicLibFirestore, Rate } from '../interfaces';
+import { CommonFireStoreDocument } from '../interfaces/common-firesotre.interface';
 import { getList } from '../services/firestore.service';
 
-// TODO: Make this hook usable for other types of voting
+interface VoteHook extends CommonFireStoreDocument {
+  orderNumber: number;
+}
 
-export const useSoloCosplay = (): [
-  CharacterFirestore[],
-  CharacterFirestore | undefined,
-  (character: CharacterFirestore) => void,
+export const useVote = <T extends VoteHook>(
+  personsCollectionRef: CollectionReference<DocumentData, DocumentData>,
+  criteriaCollectionRef: CollectionReference<DocumentData, DocumentData>
+): [
+  T[],
+  T | undefined,
+  (item: T) => void,
   (id: string) => boolean,
   (criteriaId: string) => number,
   (id: string) => boolean,
@@ -27,8 +29,8 @@ export const useSoloCosplay = (): [
   const { user } = useUser();
   const confirm = useConfirm();
 
-  const [selectedCharachter, setSelectedCharachter] = useState<CharacterFirestore>();
-  const [characters, setCharacters] = useState<CharacterFirestore[]>([]);
+  const [selectedCharachter, setSelectedCharachter] = useState<T>();
+  const [characters, setCharacters] = useState<T[]>([]);
   const [soloCosplayCriteria, setSoloCosplayCriteria] = useState<BasicLibFirestore[]>([]);
   const [rateResults, setRateResults] = useState<Map<string, Rate[]>>(new Map());
   const [showSubmitButton, setShowSubmitButton] = useState<boolean>(false);
@@ -45,22 +47,22 @@ export const useSoloCosplay = (): [
 
   const fetchChars = useCallback(async () => {
     try {
-      const chars = await getList<CharacterFirestore>(soloCosplayPersonsCollectionRef, 'desc');
+      const chars = await getList<T>(personsCollectionRef, 'desc');
       setCharacters(chars.sort((a, b) => a.orderNumber - b.orderNumber));
       setSelectedCharachter(chars[0]);
     } catch (error) {
       console.error(error);
     }
-  }, []);
+  }, [personsCollectionRef]);
 
   const fetchCriteria = useCallback(async () => {
     try {
-      const criteria = await getList<BasicLibFirestore>(soloCosplayCriteriaCollectionRef);
+      const criteria = await getList<BasicLibFirestore>(criteriaCollectionRef);
       setSoloCosplayCriteria(criteria);
     } catch (error) {
       console.error(error);
     }
-  }, []);
+  }, [criteriaCollectionRef]);
 
   const isActiveCharacter = useCallback(
     (id: string): boolean => {
@@ -69,7 +71,7 @@ export const useSoloCosplay = (): [
     [selectedCharachter]
   );
 
-  const setCharacter = useCallback((character: CharacterFirestore) => {
+  const setCharacter = useCallback((character: T) => {
     setSelectedCharachter(character);
   }, []);
 
@@ -149,6 +151,22 @@ export const useSoloCosplay = (): [
       [...rateResults.values()].every((x) => x.length === soloCosplayCriteria.length);
     setShowSubmitButton(allCharsHasFilled);
   }, [characters, rateResults, soloCosplayCriteria]);
+
+  useEffect(() => {
+    const tempResults = localStorage.getItem('soloCosplayResultsTemp');
+    const arrayResults: [string, Rate[]] = JSON.parse(tempResults || '[]');
+    if (arrayResults.length) {
+      const tempRes = new Map();
+      arrayResults.forEach(([key, value]) => {
+        tempRes.set(key, value);
+      });
+      setRateResults(tempRes);
+    }
+  }, []);
+
+  useEffect(() => {
+    localStorage.setItem('soloCosplayResultsTemp', JSON.stringify([...rateResults]));
+  }, [rateResults]);
 
   return [
     characters,

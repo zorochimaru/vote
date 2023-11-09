@@ -1,4 +1,9 @@
-import { useSoloCosplay } from '../../hooks/useSoloCosplay';
+import {
+  soloCosplayCriteriaCollectionRef,
+  soloCosplayPersonsCollectionRef
+} from '../../../firebase';
+import { useVote } from '../../hooks/useVote';
+import { CharacterFirestore } from '../../interfaces';
 import CharachterPick from './components/CharachterPick/CharachterPick';
 import CriteriaList from './components/CriteriaList';
 import InfoRow from './components/InfoRow';
@@ -16,7 +21,10 @@ const SoloCosplayVote = () => {
     patchResults,
     showSubmitButton,
     handleSubmit
-  ] = useSoloCosplay();
+  ] = useVote<CharacterFirestore>(
+    soloCosplayPersonsCollectionRef,
+    soloCosplayCriteriaCollectionRef
+  );
 
   return (
     <div className={classes.wrapper}>
