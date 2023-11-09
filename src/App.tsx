@@ -5,19 +5,18 @@ import { AuthGuard } from './hoc/AuthGuard';
 import Layout from './hoc/Layout';
 
 import { ThemeProvider, createTheme } from '@mui/material/styles';
-import { doc } from 'firebase/firestore';
+import { onSnapshot } from 'firebase/firestore';
 import { ConfirmProvider } from 'material-ui-confirm';
-import { firestore } from '../firebase';
+import { userDocumentRef } from '../firebase';
 import Loading from './components/Loading/Loading';
 import { AuthUser } from './interfaces';
-import Results from './routes/Results/Results';
-import { getDocument } from './services/firestore.service';
 
+const KPopVote = lazy(() => import('./routes/KPopVote/KPopVote'));
+const TeamCosplayVote = lazy(() => import('./routes/TeamCosplayVote/TeamCosplayVote'));
+const Results = lazy(() => import('./routes/Results/Results'));
 const SoloCosplayVote = lazy(() => import('./routes/SoloCosplayVote/SoloCosplayVote'));
 const Login = lazy(() => import('./routes/Login/Login'));
 const Home = lazy(() => import('./routes/Home/Home'));
-const Profile = lazy(() => import('./routes/Profile/Profile'));
-const ProfileList = lazy(() => import('./routes/ProfileList/ProfileList'));
 const UploadCharacters = lazy(() => import('./routes/UploadCharacters/UploadCharacters'));
 
 const darkTheme = createTheme({
@@ -30,13 +29,18 @@ export const App = () => {
   const [user, setUser] = useState<AuthUser | null>(null);
 
   const getUser = useCallback(async (uid: string) => {
-    const authUser = await getDocument<AuthUser>(doc(firestore, `authUsers/${uid}`));
-    setUser(authUser);
+    const unsuscribe = onSnapshot(userDocumentRef(uid), (doc) => {
+      setUser(doc.data() as AuthUser);
+    });
+
+    return () => {
+      unsuscribe();
+    };
   }, []);
 
   useEffect(() => {
-    if (localStorage.getItem('user')) {
-      getUser(JSON.parse(localStorage.getItem('user')!));
+    if (sessionStorage.getItem('user')) {
+      getUser(JSON.parse(sessionStorage.getItem('user')!));
     }
   }, [getUser]);
 
@@ -54,18 +58,10 @@ export const App = () => {
                   <Route element={<Layout />}>
                     <Route index element={<Home />} />
                     <Route path="solo-cosplay-vote" element={<SoloCosplayVote />} />
-                    <Route path="profiles" element={<ProfileList />} />
+                    <Route path="team-cosplay-vote" element={<TeamCosplayVote />} />
+                    <Route path="k-pop-vote" element={<KPopVote />} />
                     <Route path="results" element={<Results />} />
                     <Route path="upload-characters" element={<UploadCharacters />} />
-                    <Route path="profiles/*" element={<Profile />} />
-                    <Route
-                      path="about/*"
-                      element={
-                        <div>
-                          <p>Vote application for the Game Summit</p>
-                        </div>
-                      }
-                    />
                     <Route path="*" element={<div>404</div>} />
                   </Route>
                 </Route>

@@ -1,13 +1,17 @@
-import { FC } from 'react';
-import { CharacterFirestore } from '../../../../interfaces';
+import { CommonFirestoreWithOrder as CommonVote } from '../../interfaces';
 import classes from './charachter-pick.module.css';
 
-const CharachterPick: FC<{
+const CharachterPick = <T extends CommonVote>({
+  isActive,
+  character,
+  rated,
+  onClick
+}: {
   isActive?: boolean;
   rated?: boolean;
-  character: CharacterFirestore;
-  onClick: (character: CharacterFirestore) => void;
-}> = ({ isActive, character: character, rated, onClick }) => {
+  character: T;
+  onClick: (character: T) => void;
+}) => {
   return (
     <button
       onClick={() => onClick(character)}
@@ -15,7 +19,7 @@ const CharachterPick: FC<{
         rated && classes.rated
       }`}>
       <span className={classes.orderNumber}>{character.orderNumber}</span>
-      <img src={character.image} alt={character.characterName} />
+      <img src={character.image} alt={character.name} />
     </button>
   );
 };

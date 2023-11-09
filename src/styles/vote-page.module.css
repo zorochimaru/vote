@@ -72,6 +72,7 @@ h2 {
 .row .column:first-child {
   flex: 1;
 }
+
 .row .column:last-child {
   flex: 2;
   text-align: right;

@@ -1,5 +1,5 @@
 import { FunctionComponent } from 'react';
-import classes from '../solo-cosplay-vote.module.css';
+import classes from '../../styles/vote-page.module.css';
 
 const InfoRow: FunctionComponent<{ label: string; value: string | boolean }> = ({
   label,

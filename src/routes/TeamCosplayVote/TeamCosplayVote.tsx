@@ -1,15 +1,11 @@
-import {
-  soloCosplayCriteriaCollectionRef,
-  soloCosplayPersonsCollectionRef
-} from '../../../firebase';
+import { cosplayTeamCriteriaCollectionRef, cosplayTeamsCollectionRef } from '../../../firebase';
 import CharachterPick from '../../components/CharachterPick/CharachterPick';
 import CriteriaList from '../../components/CriteriaList/CriteriaList';
-import InfoRow from '../../components/InfoRow/InfoRow';
 import { useVote } from '../../hooks/useVote';
-import { CharacterFirestore } from '../../interfaces';
+import { TeamFirestore } from '../../interfaces';
 import classes from '../../styles/vote-page.module.css';
 
-const SoloCosplayVote = () => {
+const TeamCosplayVote = () => {
   const [
     characters,
     selectedCharachter,
@@ -21,10 +17,7 @@ const SoloCosplayVote = () => {
     patchResults,
     showSubmitButton,
     handleSubmit
-  ] = useVote<CharacterFirestore>(
-    soloCosplayPersonsCollectionRef,
-    soloCosplayCriteriaCollectionRef
-  );
+  ] = useVote<TeamFirestore>(cosplayTeamsCollectionRef, cosplayTeamCriteriaCollectionRef);
 
   return (
     <div className={classes.wrapper}>
@@ -53,12 +46,13 @@ const SoloCosplayVote = () => {
         </div>
         <div className={classes.info}>
           <h2>Description</h2>
-          <InfoRow label="Char name" value={selectedCharachter?.characterName || ''} />
+          {/* TODO: better UI for chars */}
+          {/* <InfoRow label="Char name" value={selectedCharachter?.characterName || ''} />
           <InfoRow label="Real Name" value={selectedCharachter?.name || ''} />
           <InfoRow label="Fandom" value={selectedCharachter?.fandom || ''} />
           <InfoRow label="Fandom Type" value={selectedCharachter?.fandomType || ''} />
           <InfoRow label="Self made" value={selectedCharachter?.selfMade || false} />
-          <InfoRow label="Description" value={selectedCharachter?.description || ''} />
+          <InfoRow label="Description" value={selectedCharachter?.description || ''} /> */}
         </div>
       </div>
 
@@ -77,4 +71,4 @@ const SoloCosplayVote = () => {
   );
 };
 
-export default SoloCosplayVote;
+export default TeamCosplayVote;

@@ -9,15 +9,12 @@ const Layout = () => {
   const { user, setUser } = useUser();
 
   useEffect(() => {
-    console.log('App render');
     auth.onAuthStateChanged((user) => {
       if (user) {
-        console.log(`Auth state changed. Loged In`);
-        localStorage.setItem('user', JSON.stringify(user.uid));
+        sessionStorage.setItem('user', JSON.stringify(user.uid));
       } else {
-        console.log(`Auth state changed. Loged Out`);
         setUser(null);
-        localStorage.removeItem('user');
+        sessionStorage.removeItem('user');
       }
     });
   }, [user, setUser]);

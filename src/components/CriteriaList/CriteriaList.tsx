@@ -1,6 +1,6 @@
 import { Rating } from '@mui/material';
 import { FunctionComponent, useEffect, useState } from 'react';
-import classes from '../solo-cosplay-vote.module.css';
+import classes from '../../styles/vote-page.module.css';
 
 const CriteriaList: FunctionComponent<{
   label: string;

@@ -12,15 +12,36 @@ import PropTypes from 'prop-types';
 import { FC, useState } from 'react';
 import * as XLSX from 'xlsx';
 
+import {
+  Container,
+  FormControl,
+  FormControlLabel,
+  FormLabel,
+  Radio,
+  RadioGroup
+} from '@mui/material';
 import { addDoc, serverTimestamp } from 'firebase/firestore';
-import { soloCosplayPersonsCollectionRef } from '../../../firebase';
+import {
+  cosplayTeamsCollectionRef,
+  kPopTeamsCollectionRef,
+  soloCosplayPersonsCollectionRef
+} from '../../../firebase';
 import { useUser } from '../../contexts/AuthContext';
-import { Character } from '../../interfaces';
+import { Character, CommonVote } from '../../interfaces';
 import classes from './upload-characters.module.css';
 
+type VoteTypes = 'soloCosplay' | 'teamCosplay' | 'kPop';
+
 const UploadCharacters = () => {
-  const [rows, setRows] = useState<Character[]>([]);
+  const [type, setType] = useState<VoteTypes>('soloCosplay');
+
+  const handleTypeChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setType((event.target as HTMLInputElement).value as VoteTypes);
+  };
+
+  const [rows, setRows] = useState<CommonVote[]>([]);
   const { user } = useUser();
+
   const loadFile = (event: React.ChangeEvent<HTMLInputElement>) => {
     const f = event.target.files?.[0];
     if (!f) return;
@@ -33,9 +54,12 @@ const UploadCharacters = () => {
       const wsname = wb.SheetNames[0];
       const ws = wb.Sheets[wsname];
       /* Convert array of arrays */
-      const data = XLSX.utils.sheet_to_json(ws, { defval: '' }) as Character[];
+      const data = XLSX.utils.sheet_to_json(ws, { defval: '' }) as CommonVote[];
       /* Update state */
-      const finalResult: Character[] = data.map((x, i) => ({ ...x, orderNumber: i + 1 }));
+      const finalResult: CommonVote[] = data.map((x, i) => ({
+        ...x,
+        orderNumber: i + 1
+      }));
       setRows(finalResult);
     };
     reader.readAsBinaryString(f);
@@ -43,9 +67,26 @@ const UploadCharacters = () => {
 
   const uploadFile = () => {
     const reqs = [];
+    let collection = soloCosplayPersonsCollectionRef;
+    switch (type) {
+      case 'soloCosplay':
+        collection = soloCosplayPersonsCollectionRef;
+        break;
+      case 'teamCosplay':
+        collection = cosplayTeamsCollectionRef;
+        break;
+      case 'kPop':
+        collection = kPopTeamsCollectionRef;
+        break;
+
+      default:
+        console.error('Unknown type');
+        break;
+    }
+
     for (const row of rows) {
       reqs.push(
-        addDoc(soloCosplayPersonsCollectionRef, {
+        addDoc(collection, {
           createdAt: serverTimestamp(),
           createdBy: user?.id,
           ...row
@@ -59,25 +100,48 @@ const UploadCharacters = () => {
 
   return (
     <div className={classes.wrapper}>
-      <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '10px' }}>
-        <Button component="label" variant="contained">
-          Browse file
-          <input
-            onChange={(e) => loadFile(e)}
-            style={{
-              clip: 'rect(0 0 0 0)',
-              clipPath: 'inset(50%)',
-              height: 1,
-              overflow: 'hidden',
-              position: 'absolute',
-              bottom: 0,
-              left: 0,
-              whiteSpace: 'nowrap',
-              width: 1
-            }}
-            type="file"
-          />
-        </Button>
+      <Paper
+        style={{
+          display: 'flex',
+          justifyContent: 'space-between',
+          marginBottom: '10px',
+          padding: '20px',
+          alignItems: 'flex-start'
+        }}>
+        <div style={{ display: 'flex', gap: '16px', alignItems: 'flex-start' }}>
+          <Button component="label" variant="contained">
+            Browse file
+            <input
+              onChange={(e) => loadFile(e)}
+              style={{
+                clip: 'rect(0 0 0 0)',
+                clipPath: 'inset(50%)',
+                height: 1,
+                overflow: 'hidden',
+                position: 'absolute',
+                bottom: 0,
+                left: 0,
+                whiteSpace: 'nowrap',
+                width: 1
+              }}
+              type="file"
+            />
+          </Button>
+          <FormControl>
+            <FormLabel id="demo-radio-buttons-group-label">Type</FormLabel>
+            <RadioGroup
+              value={type}
+              onChange={handleTypeChange}
+              aria-labelledby="demo-radio-buttons-group-label"
+              defaultValue="soloCosplay"
+              name="type">
+              <FormControlLabel value="soloCosplay" control={<Radio />} label="Solo Cosplay" />
+              <FormControlLabel value="teamCosplay" control={<Radio />} label="Team Cosplay" />
+              <FormControlLabel value="kPop" control={<Radio />} label="K-Pop" />
+            </RadioGroup>
+          </FormControl>
+        </div>
+
         {!!rows.length && (
           <Button
             onClick={uploadFile}
@@ -88,40 +152,34 @@ const UploadCharacters = () => {
             Upload data
           </Button>
         )}
-      </div>
+      </Paper>
       {!!rows.length && (
-        <TableContainer component={Paper}>
-          <Table sx={{ minWidth: 650 }} aria-label="simple table">
-            <TableHead>
-              <TableRow>
-                <TableCell>Name</TableCell>
-                <TableCell align="right">Fandom</TableCell>
-                <TableCell align="right">Character&nbsp;Name</TableCell>
-                <TableCell align="right">Fandom&nbsp;Type</TableCell>
-                <TableCell align="right">Image</TableCell>
-                <TableCell align="right">Self-Made</TableCell>
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {rows.map((row) => (
-                <TableRow
-                  key={row.orderNumber}
-                  sx={{ '&:last-child td, &:last-child th': { border: 0 } }}>
-                  <TableCell component="th" scope="row">
-                    {row.name}
-                  </TableCell>
-                  <TableCell align="right">{row.fandom}</TableCell>
-                  <TableCell align="right">{row.characterName}</TableCell>
-                  <TableCell align="right">{row.fandomType}</TableCell>
-                  <TableCell align="right">
-                    <CharImage row={row} />
-                  </TableCell>
-                  <TableCell align="right">{row.selfMade ? 'Yes' : 'No'}</TableCell>
+        <Container maxWidth="md">
+          <TableContainer component={Paper}>
+            <Table sx={{ minWidth: 150 }} aria-label="simple table">
+              <TableHead>
+                <TableRow>
+                  <TableCell>Name</TableCell>
+                  <TableCell align="right">Image</TableCell>
                 </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </TableContainer>
+              </TableHead>
+              <TableBody>
+                {rows.map((row) => (
+                  <TableRow
+                    key={row.orderNumber}
+                    sx={{ '&:last-child td, &:last-child th': { border: 0 } }}>
+                    <TableCell component="th" scope="row">
+                      {row.name}
+                    </TableCell>
+                    <TableCell align="right">
+                      <CharImage row={row} />
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </TableContainer>
+        </Container>
       )}
     </div>
   );

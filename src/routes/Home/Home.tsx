@@ -6,7 +6,7 @@ const Home = () => {
   const { user } = useUser();
   return (
     <div className={classes.wrapper}>
-      {user?.role === 'cosplay' && (
+      {(user?.role === 'cosplay' || user?.role === 'admin') && (
         <>
           {!user.soloCosplayFinished && (
             <Link to="/solo-cosplay-vote">
@@ -34,7 +34,7 @@ const Home = () => {
           )}
         </>
       )}
-      {user?.role === 'k-pop' && (
+      {(user?.role === 'k-pop' || user?.role === 'admin') && (
         <Link to="/k-pop-vote">
           <div className={classes.voteItem}>
             <Icon size={40} icon="artist" />

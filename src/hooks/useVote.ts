@@ -3,15 +3,10 @@ import { useConfirm } from 'material-ui-confirm';
 import { useCallback, useEffect, useState } from 'react';
 import { soloCosplayResultsCollectionRef } from '../../firebase';
 import { useUser } from '../contexts/AuthContext';
-import { BasicLibFirestore, Rate } from '../interfaces';
-import { CommonFireStoreDocument } from '../interfaces/common-firesotre.interface';
+import { BasicLibFirestore, CommonFirestoreWithOrder, Rate } from '../interfaces';
 import { getList } from '../services/firestore.service';
 
-interface VoteHook extends CommonFireStoreDocument {
-  orderNumber: number;
-}
-
-export const useVote = <T extends VoteHook>(
+export const useVote = <T extends CommonFirestoreWithOrder>(
   personsCollectionRef: CollectionReference<DocumentData, DocumentData>,
   criteriaCollectionRef: CollectionReference<DocumentData, DocumentData>
 ): [
@@ -29,20 +24,20 @@ export const useVote = <T extends VoteHook>(
   const { user } = useUser();
   const confirm = useConfirm();
 
-  const [selectedCharachter, setSelectedCharachter] = useState<T>();
+  const [selectedCharacter, setSelectedCharachter] = useState<T>();
   const [characters, setCharacters] = useState<T[]>([]);
   const [soloCosplayCriteria, setSoloCosplayCriteria] = useState<BasicLibFirestore[]>([]);
   const [rateResults, setRateResults] = useState<Map<string, Rate[]>>(new Map());
   const [showSubmitButton, setShowSubmitButton] = useState<boolean>(false);
 
-  const selectedCharachtersRate = useCallback(
+  const selectedCharactersRate = useCallback(
     (criteriaId: string): number => {
-      const res = rateResults.has(selectedCharachter!.id)
-        ? rateResults.get(selectedCharachter!.id)!
+      const res = rateResults.has(selectedCharacter!.id)
+        ? rateResults.get(selectedCharacter!.id)!
         : [];
       return res.find((x) => x.criteriaId === criteriaId)?.value || 0;
     },
-    [selectedCharachter, rateResults]
+    [selectedCharacter, rateResults]
   );
 
   const fetchChars = useCallback(async () => {
@@ -66,9 +61,9 @@ export const useVote = <T extends VoteHook>(
 
   const isActiveCharacter = useCallback(
     (id: string): boolean => {
-      return selectedCharachter?.id === id;
+      return selectedCharacter?.id === id;
     },
-    [selectedCharachter]
+    [selectedCharacter]
   );
 
   const setCharacter = useCallback((character: T) => {
@@ -105,32 +100,30 @@ export const useVote = <T extends VoteHook>(
       }
 
       await Promise.all(resultRequests);
-      localStorage.removeItem('soloCosplayResultsTemp');
+      sessionStorage.removeItem(`${personsCollectionRef.id}`);
     } catch (error) {
       console.error(error);
     }
-  }, [rateResults, user]);
+  }, [rateResults, user, personsCollectionRef]);
 
   const patchResults = useCallback(
     (criteriaId: string, value: number) => {
-      if (rateResults.has(selectedCharachter!.id)) {
-        const currRes = rateResults.get(selectedCharachter!.id)!;
+      if (rateResults.has(selectedCharacter!.id)) {
+        const currRes = rateResults.get(selectedCharacter!.id)!;
         const currCriteriaRes = currRes.findIndex((x) => x.criteriaId === criteriaId);
         if (currCriteriaRes !== -1) {
           currRes.splice(currCriteriaRes, 1, { criteriaId, value });
-          setRateResults((prev) => new Map(prev.set(selectedCharachter!.id, [...currRes])));
+          setRateResults((prev) => new Map(prev.set(selectedCharacter!.id, [...currRes])));
         } else {
           setRateResults(
-            (prev) => new Map(prev.set(selectedCharachter!.id, [...currRes, { criteriaId, value }]))
+            (prev) => new Map(prev.set(selectedCharacter!.id, [...currRes, { criteriaId, value }]))
           );
         }
       } else {
-        setRateResults(
-          (prev) => new Map(prev.set(selectedCharachter!.id, [{ criteriaId, value }]))
-        );
+        setRateResults((prev) => new Map(prev.set(selectedCharacter!.id, [{ criteriaId, value }])));
       }
     },
-    [selectedCharachter, rateResults]
+    [selectedCharacter, rateResults]
   );
 
   useEffect(() => {
@@ -153,7 +146,7 @@ export const useVote = <T extends VoteHook>(
   }, [characters, rateResults, soloCosplayCriteria]);
 
   useEffect(() => {
-    const tempResults = localStorage.getItem('soloCosplayResultsTemp');
+    const tempResults = sessionStorage.getItem(`${personsCollectionRef.id}`);
     const arrayResults: [string, Rate[]] = JSON.parse(tempResults || '[]');
     if (arrayResults.length) {
       const tempRes = new Map();
@@ -162,18 +155,18 @@ export const useVote = <T extends VoteHook>(
       });
       setRateResults(tempRes);
     }
-  }, []);
+  }, [personsCollectionRef]);
 
   useEffect(() => {
-    localStorage.setItem('soloCosplayResultsTemp', JSON.stringify([...rateResults]));
-  }, [rateResults]);
+    sessionStorage.setItem(`${personsCollectionRef.id}`, JSON.stringify([...rateResults]));
+  }, [rateResults, personsCollectionRef]);
 
   return [
     characters,
-    selectedCharachter,
+    selectedCharacter,
     setCharacter,
     isActiveCharacter,
-    selectedCharachtersRate,
+    selectedCharactersRate,
     isRated,
     soloCosplayCriteria,
     patchResults,
