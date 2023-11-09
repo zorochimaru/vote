@@ -28,16 +28,20 @@ h2 {
   flex: 1;
   padding: 10px;
 }
+
 .submitBtn:disabled {
   opacity: 0.5;
   color: initial;
 }
+
 .submitBtn:active {
   color: initial;
 }
+
 .submitBtn {
   float: right;
   margin-top: 20px;
+  margin-right: 20px;
   border-radius: 8px;
   font-size: 16px;
   outline: none;
@@ -60,8 +64,18 @@ h2 {
   border-bottom: 1px solid #fff;
 }
 
+.row .column {
+  max-height: 150px;
+  overflow: auto;
+}
+
 .row .column:first-child {
-  flex: 50%;
+  flex: 1;
+}
+.row .column:last-child {
+  flex: 2;
+  text-align: right;
+  padding-right: 16px;
 }
 
 .avatar {

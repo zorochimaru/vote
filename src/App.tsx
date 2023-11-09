@@ -6,6 +6,7 @@ import Layout from './hoc/Layout';
 
 import { ThemeProvider, createTheme } from '@mui/material/styles';
 import { doc } from 'firebase/firestore';
+import { ConfirmProvider } from 'material-ui-confirm';
 import { firestore } from '../firebase';
 import Loading from './components/Loading/Loading';
 import { AuthUser } from './interfaces';
@@ -45,30 +46,32 @@ export const App = () => {
     <ThemeProvider theme={darkTheme}>
       <UserContext.Provider value={userFactory}>
         <Suspense fallback={<Loading />}>
-          <BrowserRouter>
-            <Routes>
-              <Route path="login" element={<Login />} />
-              <Route element={<AuthGuard />}>
-                <Route element={<Layout />}>
-                  <Route index element={<Home />} />
-                  <Route path="solo-cosplay-vote" element={<SoloCosplayVote />} />
-                  <Route path="profiles" element={<ProfileList />} />
-                  <Route path="results" element={<Results />} />
-                  <Route path="upload-characters" element={<UploadCharacters />} />
-                  <Route path="profiles/*" element={<Profile />} />
-                  <Route
-                    path="about/*"
-                    element={
-                      <div>
-                        <p>Vote application for the Game Summit</p>
-                      </div>
-                    }
-                  />
-                  <Route path="*" element={<div>404</div>} />
+          <ConfirmProvider>
+            <BrowserRouter>
+              <Routes>
+                <Route path="login" element={<Login />} />
+                <Route element={<AuthGuard />}>
+                  <Route element={<Layout />}>
+                    <Route index element={<Home />} />
+                    <Route path="solo-cosplay-vote" element={<SoloCosplayVote />} />
+                    <Route path="profiles" element={<ProfileList />} />
+                    <Route path="results" element={<Results />} />
+                    <Route path="upload-characters" element={<UploadCharacters />} />
+                    <Route path="profiles/*" element={<Profile />} />
+                    <Route
+                      path="about/*"
+                      element={
+                        <div>
+                          <p>Vote application for the Game Summit</p>
+                        </div>
+                      }
+                    />
+                    <Route path="*" element={<div>404</div>} />
+                  </Route>
                 </Route>
-              </Route>
-            </Routes>
-          </BrowserRouter>
+              </Routes>
+            </BrowserRouter>
+          </ConfirmProvider>
         </Suspense>
       </UserContext.Provider>
     </ThemeProvider>
