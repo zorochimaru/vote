@@ -2,6 +2,7 @@ import { initializeApp } from 'firebase/app';
 import { getAuth } from 'firebase/auth';
 
 import { collection, doc, getFirestore } from 'firebase/firestore';
+import { FirestoreCollections } from './src/interfaces';
 
 const firebaseConfig = {
   apiKey: import.meta.env.VITE_FIREBASECONFIG_API_KEY,
@@ -19,14 +20,35 @@ export const firestore = getFirestore(app);
 
 export const userDocumentRef = (uid: string) => doc(firestore, `authUsers`, uid);
 
-export const soloCosplayPersonsCollectionRef = collection(firestore, `soloCosplayPersons`);
-export const soloCosplayCriteriaCollectionRef = collection(firestore, `soloCosplayCriteria`);
-export const soloCosplayResultsCollectionRef = collection(firestore, `soloCosplayResults`);
+export const soloCosplayPersonsCollectionRef = collection(
+  firestore,
+  FirestoreCollections.soloCosplayPersons
+);
+export const soloCosplayCriteriaCollectionRef = collection(
+  firestore,
+  FirestoreCollections.soloCosplayCriteria
+);
+export const soloCosplayResultsCollectionRef = collection(
+  firestore,
+  FirestoreCollections.soloCosplayResults
+);
 
-export const cosplayTeamsCollectionRef = collection(firestore, `cosplayTeam`);
-export const cosplayTeamCriteriaCollectionRef = collection(firestore, `cosplayTeamCriteria`);
-export const cosplayTeamResultsCollectionRef = collection(firestore, `cosplayTeamResults`);
+export const cosplayTeamsCollectionRef = collection(firestore, FirestoreCollections.cosplayTeam);
+export const cosplayTeamCriteriaCollectionRef = collection(
+  firestore,
+  FirestoreCollections.cosplayTeamCriteria
+);
+export const cosplayTeamResultsCollectionRef = collection(
+  firestore,
+  FirestoreCollections.cosplayTeamResults
+);
 
-export const kPopTeamsCollectionRef = collection(firestore, `kPopTeams`);
-export const kPopTeamCriteriaCollectionRef = collection(firestore, `kPopTeamCriteria`);
-export const kPopTeamResultsCollectionRef = collection(firestore, `kPopTeamResults`);
+export const kPopTeamsCollectionRef = collection(firestore, FirestoreCollections.kPopTeams);
+export const kPopTeamCriteriaCollectionRef = collection(
+  firestore,
+  FirestoreCollections.kPopTeamCriteria
+);
+export const kPopTeamResultsCollectionRef = collection(
+  firestore,
+  FirestoreCollections.kPopTeamResults
+);

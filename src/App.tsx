@@ -29,12 +29,12 @@ export const App = () => {
   const [user, setUser] = useState<AuthUser | null>(null);
 
   const getUser = useCallback(async (uid: string) => {
-    const unsuscribe = onSnapshot(userDocumentRef(uid), (doc) => {
+    const unsubscribe = onSnapshot(userDocumentRef(uid), (doc) => {
       setUser({ ...doc.data(), id: doc.id } as AuthUser);
     });
 
     return () => {
-      unsuscribe();
+      unsubscribe();
     };
   }, []);
 
