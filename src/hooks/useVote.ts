@@ -25,7 +25,7 @@ export const useVote = <T extends CommonFirestoreWithOrder>(
   (criteriaId: string) => number,
   (id: string) => boolean,
   BasicLibFirestore[],
-  (criteriaId: string, value: number) => void,
+  (criteriaId: string, criteria: string, value: number) => void,
   boolean,
   () => void
 ] => {
@@ -35,7 +35,7 @@ export const useVote = <T extends CommonFirestoreWithOrder>(
 
   const [selectedCharacter, setSelectedCharachter] = useState<T>();
   const [characters, setCharacters] = useState<T[]>([]);
-  const [soloCosplayCriteria, setSoloCosplayCriteria] = useState<BasicLibFirestore[]>([]);
+  const [cosplayCriteria, setSoloCosplayCriteria] = useState<BasicLibFirestore[]>([]);
   const [rateResults, setRateResults] = useState<Map<string, Rate[]>>(new Map());
   const [showSubmitButton, setShowSubmitButton] = useState<boolean>(false);
 
@@ -81,9 +81,9 @@ export const useVote = <T extends CommonFirestoreWithOrder>(
 
   const isRated = useCallback(
     (id: string): boolean => {
-      return rateResults.has(id) && [...rateResults.get(id)!].length === soloCosplayCriteria.length;
+      return rateResults.has(id) && [...rateResults.get(id)!].length === cosplayCriteria.length;
     },
-    [rateResults, soloCosplayCriteria]
+    [rateResults, cosplayCriteria]
   );
 
   const handleSubmit = () => {
@@ -101,6 +101,7 @@ export const useVote = <T extends CommonFirestoreWithOrder>(
           createdAt: serverTimestamp(),
           createdBy: user?.id,
           personId,
+          personNickname: characters.find((x) => x.id === personId)?.name || '',
           results
         });
       }
@@ -124,23 +125,28 @@ export const useVote = <T extends CommonFirestoreWithOrder>(
     } catch (error) {
       console.error(error);
     }
-  }, [rateResults, user, personsCollectionRef, resultsCollectionRef, navigate]);
+  }, [rateResults, user, personsCollectionRef, resultsCollectionRef, navigate, characters]);
 
   const patchResults = useCallback(
-    (criteriaId: string, value: number) => {
+    (criteriaId: string, criteria: string, value: number) => {
       if (rateResults.has(selectedCharacter!.id)) {
         const currRes = rateResults.get(selectedCharacter!.id)!;
         const currCriteriaRes = currRes.findIndex((x) => x.criteriaId === criteriaId);
         if (currCriteriaRes !== -1) {
-          currRes.splice(currCriteriaRes, 1, { criteriaId, value });
+          currRes.splice(currCriteriaRes, 1, { criteriaId, value, criteria });
           setRateResults((prev) => new Map(prev.set(selectedCharacter!.id, [...currRes])));
         } else {
           setRateResults(
-            (prev) => new Map(prev.set(selectedCharacter!.id, [...currRes, { criteriaId, value }]))
+            (prev) =>
+              new Map(
+                prev.set(selectedCharacter!.id, [...currRes, { criteriaId, value, criteria }])
+              )
           );
         }
       } else {
-        setRateResults((prev) => new Map(prev.set(selectedCharacter!.id, [{ criteriaId, value }])));
+        setRateResults(
+          (prev) => new Map(prev.set(selectedCharacter!.id, [{ criteriaId, value, criteria }]))
+        );
       }
     },
     [selectedCharacter, rateResults]
@@ -154,16 +160,16 @@ export const useVote = <T extends CommonFirestoreWithOrder>(
   useEffect(() => {
     const allCharsHasFilled =
       characters.length === rateResults.size &&
-      [...rateResults.values()].every((x) => x.length === soloCosplayCriteria.length);
+      [...rateResults.values()].every((x) => x.length === cosplayCriteria.length);
     setShowSubmitButton(allCharsHasFilled);
-  }, [characters, rateResults, soloCosplayCriteria]);
+  }, [characters, rateResults, cosplayCriteria]);
 
   useEffect(() => {
     const allCharsHasFilled =
       characters.length === rateResults.size &&
-      [...rateResults.values()].every((x) => x.length === soloCosplayCriteria.length);
+      [...rateResults.values()].every((x) => x.length === cosplayCriteria.length);
     setShowSubmitButton(allCharsHasFilled);
-  }, [characters, rateResults, soloCosplayCriteria]);
+  }, [characters, rateResults, cosplayCriteria]);
 
   useEffect(() => {
     const tempResults = sessionStorage.getItem(`${personsCollectionRef.id}`);
@@ -188,7 +194,7 @@ export const useVote = <T extends CommonFirestoreWithOrder>(
     isActiveCharacter,
     selectedCharactersRate,
     isRated,
-    soloCosplayCriteria,
+    cosplayCriteria,
     patchResults,
     showSubmitButton,
     handleSubmit

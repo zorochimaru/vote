@@ -1,8 +1,8 @@
 import { signInWithEmailAndPassword } from '@firebase/auth';
-import { doc } from 'firebase/firestore';
+import { doc, setDoc } from 'firebase/firestore';
 import { useState } from 'react';
 import { Navigate } from 'react-router-dom';
-import { auth, firestore } from '../../../firebase';
+import { auth, firestore, userDocumentRef } from '../../../firebase';
 import { useUser } from '../../contexts/AuthContext';
 import { AuthUser } from '../../interfaces';
 import { getDocument } from '../../services/firestore.service';
@@ -19,7 +19,23 @@ const Login = () => {
       const authUser = await getDocument<AuthUser>(
         doc(firestore, `authUsers/${logedUser.user.uid}`)
       );
-      setUser(authUser);
+      if (authUser) {
+        setUser(authUser);
+      } else {
+        const newUser: Omit<AuthUser, 'id'> = {
+          canUpload: false,
+          email: logedUser.user.email || '',
+          role: 'cosplay',
+          soloCosplayFinished: false,
+          kpopFinished: false,
+          teamCosplayFinished: false
+        };
+        await setDoc(userDocumentRef(logedUser.user.email || 'anon'), newUser);
+        const createdUser = await getDocument<AuthUser>(
+          doc(firestore, `authUsers/${logedUser.user.email}`)
+        );
+        setUser(createdUser);
+      }
     } catch (error) {
       console.error(error);
     }

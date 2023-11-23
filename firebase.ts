@@ -20,6 +20,8 @@ export const firestore = getFirestore(app);
 
 export const userDocumentRef = (uid: string) => doc(firestore, `authUsers`, uid);
 
+export const authUsersCollectionRef = collection(firestore, FirestoreCollections.authUsers);
+
 export const soloCosplayPersonsCollectionRef = collection(
   firestore,
   FirestoreCollections.soloCosplayPersons

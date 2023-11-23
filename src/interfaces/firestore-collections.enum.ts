@@ -1,4 +1,5 @@
 export enum FirestoreCollections {
+  authUsers = 'authUsers',
   soloCosplayPersons = 'soloCosplayPersons',
   soloCosplayCriteria = 'soloCosplayCriteria',
   soloCosplayResults = 'soloCosplayResults',

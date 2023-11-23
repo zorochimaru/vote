@@ -1,267 +1,134 @@
-import Box from '@mui/material/Box';
-import Paper from '@mui/material/Paper';
-import Table from '@mui/material/Table';
-import TableBody from '@mui/material/TableBody';
-import TableCell from '@mui/material/TableCell';
-import TableContainer from '@mui/material/TableContainer';
-import TableHead from '@mui/material/TableHead';
-import TablePagination from '@mui/material/TablePagination';
-import TableRow from '@mui/material/TableRow';
-import TableSortLabel from '@mui/material/TableSortLabel';
-import { visuallyHidden } from '@mui/utils';
-import * as React from 'react';
+import { useCallback, useEffect, useState } from 'react';
+import { soloCosplayResultsCollectionRef } from '../../../firebase';
+import EnhancedTable from '../../components/EnhancedTable/EnhancedTable';
+import { ResultFirestore } from '../../interfaces/result-firestore.interface';
+import { HeadCell } from '../../interfaces/table-header-cell.interface';
+import { getList } from '../../services/firestore.service';
+interface Result {
+  criteriaId: string;
+  criteria: string;
+  value: number;
+}
 
-// TODO: Remove this interface
-interface Data {
-  id: number;
-  calories: number;
-  carbs: number;
-  fat: number;
+interface TableRow {
   name: string;
-  protein: number;
+  [criteriaId: string]: number | string;
+  summary: number;
 }
 
-function createData(
-  id: number,
-  name: string,
-  calories: number,
-  fat: number,
-  carbs: number,
-  protein: number
-): Data {
-  return {
-    id,
-    name,
-    calories,
-    fat,
-    carbs,
-    protein
-  };
+interface GroupedResults {
+  [personNickname: string]: { [criteriaId: string]: number };
 }
 
-// TODO: fetch from results and map to id, name, results
-const rows = [
-  createData(1, 'Cupcake', 305, 3.7, 67, 4.3),
-  createData(2, 'Donut', 452, 25.0, 51, 4.9),
-  createData(3, 'Eclair', 262, 16.0, 24, 6.0),
-  createData(4, 'Frozen yoghurt', 159, 6.0, 24, 4.0),
-  createData(5, 'Gingerbread', 356, 16.0, 49, 3.9),
-  createData(6, 'Honeycomb', 408, 3.2, 87, 6.5),
-  createData(7, 'Ice cream sandwich', 237, 9.0, 37, 4.3),
-  createData(8, 'Jelly Bean', 375, 0.0, 94, 0.0),
-  createData(9, 'KitKat', 518, 26.0, 65, 7.0),
-  createData(10, 'Lollipop', 392, 0.2, 98, 0.0),
-  createData(11, 'Marshmallow', 318, 0, 81, 2.0),
-  createData(12, 'Nougat', 360, 19.0, 9, 37.0),
-  createData(13, 'Oreo', 437, 18.0, 63, 4.0)
-];
+const Results = () => {
+  const [results, setResults] = useState<ResultFirestore[]>([]);
+  const [rows, setRows] = useState<TableRow[]>([]);
+  const [headCell, setHeadCell] = useState<HeadCell[]>([]);
 
-function descendingComparator<T>(a: T, b: T, orderBy: keyof T) {
-  if (b[orderBy] < a[orderBy]) {
-    return -1;
-  }
-  if (b[orderBy] > a[orderBy]) {
-    return 1;
-  }
-  return 0;
-}
+  const fetchResults = useCallback(async () => {
+    setResults(await getList<ResultFirestore>(soloCosplayResultsCollectionRef));
+  }, []);
 
-type Order = 'asc' | 'desc';
+  const generateHeaders = useCallback(() => {
+    if (results.length) {
+      const uniqueCriteriaIds = new Set<string>();
+      // Collect unique criteria
+      results.forEach((entry) => {
+        entry.results.forEach((result: Result) => {
+          uniqueCriteriaIds.add(result.criteriaId);
+        });
+      });
 
-function getComparator<Key extends keyof Data>(
-  order: Order,
-  orderBy: Key
-): (a: { [key in Key]: number | string }, b: { [key in Key]: number | string }) => number {
-  return order === 'desc'
-    ? (a, b) => descendingComparator(a, b, orderBy)
-    : (a, b) => -descendingComparator(a, b, orderBy);
-}
+      // Convert the set of unique criteria to an array
+      const uniqueCriteriaArray = Array.from(uniqueCriteriaIds);
 
-function stableSort<T>(array: readonly T[], comparator: (a: T, b: T) => number) {
-  const stabilizedThis = array.map((el, index) => [el, index] as [T, number]);
-  stabilizedThis.sort((a, b) => {
-    const order = comparator(a[0], b[0]);
-    if (order !== 0) {
-      return order;
+      const headerCells = [
+        // Add the "Name" criteria at the beginning
+        {
+          disablePadding: false,
+          id: 'name',
+          label: 'Name',
+          alignRight: false
+        },
+        // Add criteria objects based on unique criteria
+        ...uniqueCriteriaArray.map((criteriaId) => {
+          const result = results[0]?.results.find(
+            (result: Result) => result.criteriaId === criteriaId
+          );
+          const isNumber = result?.value !== undefined && typeof result.value === 'number';
+
+          return {
+            disablePadding: false,
+            id: criteriaId,
+            label: result?.criteria || '', // Handle the case where criteria information is not available
+            alignRight: isNumber
+          };
+        }),
+        // Add the "Summary" criteria at the end
+        {
+          disablePadding: false,
+          id: 'summary',
+          label: 'Summary',
+          alignRight: true
+        }
+      ];
+
+      setHeadCell(headerCells);
     }
-    return a[1] - b[1];
-  });
-  return stabilizedThis.map((el) => el[0]);
-}
+  }, [results]);
 
-interface HeadCell {
-  disablePadding: boolean;
-  id: keyof Data;
-  label: string;
-  numeric: boolean;
-}
+  const generateRows = useCallback(() => {
+    if (results.length) {
+      // Use array.reduce to create the grouped object
+      const grouped: GroupedResults = results.reduce((acc, cur) => {
+        const personNickname = cur.personNickname;
 
-// TODO: Fetch criteria and fill headCells with mapping label and first is not numeric
-const headCells: readonly HeadCell[] = [
-  {
-    id: 'name',
-    numeric: false,
-    disablePadding: false,
-    label: 'Dessert (100g serving)'
-  },
-  {
-    id: 'calories',
-    numeric: true,
-    disablePadding: false,
-    label: 'Calories'
-  },
-  {
-    id: 'fat',
-    numeric: true,
-    disablePadding: false,
-    label: 'Fat (g)'
-  },
-  {
-    id: 'carbs',
-    numeric: true,
-    disablePadding: false,
-    label: 'Carbs (g)'
-  },
-  {
-    id: 'protein',
-    numeric: true,
-    disablePadding: false,
-    label: 'Protein (g)'
-  }
-];
+        if (!acc[personNickname]) {
+          acc[personNickname] = {};
+        }
 
-interface EnhancedTableProps {
-  onRequestSort: (event: React.MouseEvent<unknown>, property: keyof Data) => void;
-  order: Order;
-  orderBy: string;
-  rowCount: number;
-}
+        for (const result of cur.results) {
+          const { criteriaId, value } = result;
 
-function EnhancedTableHead(props: EnhancedTableProps) {
-  const { order, orderBy, onRequestSort } = props;
-  const createSortHandler = (property: keyof Data) => (event: React.MouseEvent<unknown>) => {
-    onRequestSort(event, property);
-  };
+          if (!acc[personNickname][criteriaId]) {
+            acc[personNickname][criteriaId] = 0;
+          }
 
-  return (
-    <TableHead>
-      <TableRow>
-        {headCells.map((headCell) => (
-          <TableCell
-            key={headCell.id}
-            align={headCell.numeric ? 'right' : 'left'}
-            padding={headCell.disablePadding ? 'none' : 'normal'}
-            sortDirection={orderBy === headCell.id ? order : false}>
-            <TableSortLabel
-              active={orderBy === headCell.id}
-              direction={orderBy === headCell.id ? order : 'asc'}
-              onClick={createSortHandler(headCell.id)}>
-              {headCell.label}
-              {orderBy === headCell.id ? (
-                <Box component="span" sx={visuallyHidden}>
-                  {order === 'desc' ? 'sorted descending' : 'sorted ascending'}
-                </Box>
-              ) : null}
-            </TableSortLabel>
-          </TableCell>
-        ))}
-      </TableRow>
-    </TableHead>
-  );
-}
+          acc[personNickname][criteriaId] += value;
+        }
 
-export default function EnhancedTable() {
-  const [order, setOrder] = React.useState<Order>('asc');
-  const [orderBy, setOrderBy] = React.useState<keyof Data>('calories');
-  const [page, setPage] = React.useState(0);
-  const [rowsPerPage, setRowsPerPage] = React.useState(5);
+        return acc;
+      }, {} as GroupedResults);
 
-  const handleRequestSort = (_event: React.MouseEvent<unknown>, property: keyof Data) => {
-    const isAsc = orderBy === property && order === 'asc';
-    setOrder(isAsc ? 'desc' : 'asc');
-    setOrderBy(property);
-  };
+      // Use Object.entries and array.map to create the table array
+      const table: TableRow[] = Object.entries(grouped).map(([name, criteriaValues]) => {
+        const row: TableRow = {
+          name,
+          summary: 0
+        };
 
-  const handleClick = (row: Data) => {
-    // TODO: open modal with picture
-    console.log(row);
-  };
+        Object.entries(criteriaValues).forEach(([criteriaId, value]) => {
+          row[criteriaId] = value;
+          row.summary += value as number;
+        });
 
-  const handleChangePage = (_event: unknown, newPage: number) => {
-    setPage(newPage);
-  };
+        return row;
+      });
 
-  const handleChangeRowsPerPage = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setRowsPerPage(parseInt(event.target.value, 10));
-    setPage(0);
-  };
+      setRows(table);
+    }
+  }, [results]);
 
-  // Avoid a layout jump when reaching the last page with empty rows.
-  const emptyRows = page > 0 ? Math.max(0, (1 + page) * rowsPerPage - rows.length) : 0;
+  useEffect(() => {
+    fetchResults();
+  }, [fetchResults]);
 
-  const visibleRows = React.useMemo(
-    () =>
-      stableSort(rows, getComparator(order, orderBy)).slice(
-        page * rowsPerPage,
-        page * rowsPerPage + rowsPerPage
-      ),
-    [order, orderBy, page, rowsPerPage]
-  );
+  useEffect(() => {
+    generateHeaders();
+    generateRows();
+  }, [generateHeaders, generateRows]);
 
-  return (
-    <Box sx={{ width: '100%' }}>
-      <Paper sx={{ width: '100%', mb: 2 }}>
-        <TableContainer>
-          <Table sx={{ minWidth: 750 }} aria-labelledby="tableTitle" size="medium">
-            <EnhancedTableHead
-              order={order}
-              orderBy={orderBy}
-              onRequestSort={handleRequestSort}
-              rowCount={rows.length}
-            />
-            <TableBody>
-              {visibleRows.map((row, index) => {
-                const labelId = `enhanced-table-${index}`;
+  return <EnhancedTable headCells={headCell} rows={rows} />;
+};
 
-                return (
-                  <TableRow
-                    hover
-                    onClick={() => handleClick(row)}
-                    tabIndex={-1}
-                    key={row.id}
-                    sx={{ cursor: 'pointer' }}>
-                    {/* TODO: map results with criteria id */}
-                    <TableCell component="th" id={labelId} scope="row" padding="normal">
-                      {row.name}
-                    </TableCell>
-                    <TableCell align="right">{row.calories}</TableCell>
-                    <TableCell align="right">{row.fat}</TableCell>
-                    <TableCell align="right">{row.carbs}</TableCell>
-                    <TableCell align="right">{row.protein}</TableCell>
-                  </TableRow>
-                );
-              })}
-              {emptyRows > 0 && (
-                <TableRow
-                  style={{
-                    height: 53 * emptyRows
-                  }}>
-                  <TableCell colSpan={6} />
-                </TableRow>
-              )}
-            </TableBody>
-          </Table>
-        </TableContainer>
-        <TablePagination
-          rowsPerPageOptions={[5, 10, 25]}
-          component="div"
-          count={rows.length}
-          rowsPerPage={rowsPerPage}
-          page={page}
-          onPageChange={handleChangePage}
-          onRowsPerPageChange={handleChangeRowsPerPage}
-        />
-      </Paper>
-    </Box>
-  );
-}
+export default Results;

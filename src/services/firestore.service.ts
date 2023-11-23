@@ -11,7 +11,7 @@ export const getList = async <T>(
   return docsSnap.docs.map((doc) => ({ id: doc.id, ...doc.data() }) as T);
 };
 
-export const getDocument = async <T>(documentRef: DocumentReference): Promise<T> => {
+export const getDocument = async <T>(documentRef: DocumentReference): Promise<T | null> => {
   const doc = await getDoc(documentRef);
-  return { id: doc.id, ...doc.data() } as T;
+  return doc.exists() ? ({ id: doc.id, ...doc.data() } as T) : null;
 };
