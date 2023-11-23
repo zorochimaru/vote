@@ -38,7 +38,7 @@ const TeamCosplayVote = () => {
                 key={criteria.id}
                 label={criteria.label}
                 value={selectedCharachtersRate(criteria.id)}
-                onChange={(value) => patchResults(criteria.id, value)}
+                onChange={(value) => patchResults(criteria.id, criteria.label, value)}
               />
             ))}
           </div>
