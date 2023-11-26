@@ -1,6 +1,5 @@
 export interface Kpop {
   name: string;
-  image: string;
-  trackName: string;
+  personCount: number;
   orderNumber: number;
 }

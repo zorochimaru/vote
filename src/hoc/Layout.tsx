@@ -11,10 +11,10 @@ const Layout = () => {
   useEffect(() => {
     auth.onAuthStateChanged((user) => {
       if (user) {
-        sessionStorage.setItem('user', JSON.stringify(user.uid));
+        localStorage.setItem('user', JSON.stringify(user.uid));
       } else {
         setUser(null);
-        sessionStorage.removeItem('user');
+        localStorage.removeItem('user');
       }
     });
   }, [user, setUser]);

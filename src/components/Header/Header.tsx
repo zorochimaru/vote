@@ -9,14 +9,14 @@ const Header = () => {
   const [showResultsLink, setShowResultsLink] = useState(false);
   const logout = () => {
     signOut(auth).then(() => {
-      sessionStorage.clear();
+      localStorage.clear();
     });
   };
 
   const canSeeResultsLink = useCallback((): boolean => {
     return (
       (user?.role === 'cosplay' && user?.soloCosplayFinished && user?.teamCosplayFinished) ||
-      (user?.role === 'k-pop' && user?.kpopFinished) ||
+      (user?.role === 'k-pop' && user?.kPopFinished) ||
       false
     );
   }, [user]);

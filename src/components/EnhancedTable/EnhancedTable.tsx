@@ -169,7 +169,7 @@ export default function EnhancedTable({
                   style={{
                     height: 53 * emptyRows
                   }}>
-                  <TableCell colSpan={6} />
+                  <TableCell colSpan={headCells.length} />
                 </TableRow>
               )}
             </TableBody>

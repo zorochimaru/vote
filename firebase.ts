@@ -35,7 +35,7 @@ export const soloCosplayResultsCollectionRef = collection(
   FirestoreCollections.soloCosplayResults
 );
 
-export const cosplayTeamsCollectionRef = collection(firestore, FirestoreCollections.cosplayTeam);
+export const cosplayTeamsCollectionRef = collection(firestore, FirestoreCollections.cosplayTeams);
 export const cosplayTeamCriteriaCollectionRef = collection(
   firestore,
   FirestoreCollections.cosplayTeamCriteria

@@ -26,16 +26,14 @@ import {
   soloCosplayPersonsCollectionRef
 } from '../../../firebase';
 import { useUser } from '../../contexts/AuthContext';
-import { CommonVote } from '../../interfaces';
+import { CommonVote, FirestoreCollections } from '../../interfaces';
 import classes from './upload-characters.module.css';
 
-type VoteTypes = 'soloCosplay' | 'teamCosplay' | 'kPop';
-
 const UploadCharacters = () => {
-  const [type, setType] = useState<VoteTypes>('soloCosplay');
+  const [type, setType] = useState<FirestoreCollections>(FirestoreCollections.soloCosplayPersons);
 
   const handleTypeChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setType((event.target as HTMLInputElement).value as VoteTypes);
+    setType((event.target as HTMLInputElement).value as FirestoreCollections);
   };
 
   const [rows, setRows] = useState<CommonVote[]>([]);
@@ -68,13 +66,13 @@ const UploadCharacters = () => {
     const reqs = [];
     let collection = soloCosplayPersonsCollectionRef;
     switch (type) {
-      case 'soloCosplay':
+      case FirestoreCollections.soloCosplayPersons:
         collection = soloCosplayPersonsCollectionRef;
         break;
-      case 'teamCosplay':
+      case FirestoreCollections.cosplayTeams:
         collection = cosplayTeamsCollectionRef;
         break;
-      case 'kPop':
+      case FirestoreCollections.kPopTeams:
         collection = kPopTeamsCollectionRef;
         break;
 
@@ -132,11 +130,23 @@ const UploadCharacters = () => {
               value={type}
               onChange={handleTypeChange}
               aria-labelledby="demo-radio-buttons-group-label"
-              defaultValue="soloCosplay"
+              defaultValue={FirestoreCollections.soloCosplayPersons}
               name="type">
-              <FormControlLabel value="soloCosplay" control={<Radio />} label="Solo Cosplay" />
-              <FormControlLabel value="teamCosplay" control={<Radio />} label="Team Cosplay" />
-              <FormControlLabel value="kPop" control={<Radio />} label="K-Pop" />
+              <FormControlLabel
+                value={FirestoreCollections.soloCosplayPersons}
+                control={<Radio />}
+                label="Solo Cosplay"
+              />
+              <FormControlLabel
+                value={FirestoreCollections.cosplayTeams}
+                control={<Radio />}
+                label="Team Cosplay"
+              />
+              <FormControlLabel
+                value={FirestoreCollections.kPopTeams}
+                control={<Radio />}
+                label="K-Pop"
+              />
             </RadioGroup>
           </FormControl>
         </div>

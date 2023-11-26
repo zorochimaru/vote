@@ -1,7 +1,7 @@
 import { FunctionComponent } from 'react';
 import classes from '../../styles/vote-page.module.css';
 
-const InfoRow: FunctionComponent<{ label: string; value: string | boolean }> = ({
+const InfoRow: FunctionComponent<{ label: string; value: string | boolean | number }> = ({
   label,
   value
 }) => {

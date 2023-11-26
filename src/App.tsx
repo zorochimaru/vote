@@ -39,8 +39,8 @@ export const App = () => {
   }, []);
 
   useEffect(() => {
-    if (sessionStorage.getItem('user')) {
-      getUser(JSON.parse(sessionStorage.getItem('user')!));
+    if (localStorage.getItem('user')) {
+      getUser(JSON.parse(localStorage.getItem('user')!));
     }
   }, [getUser]);
 

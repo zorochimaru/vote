@@ -5,5 +5,5 @@ export interface AuthUser {
   role: 'cosplay' | 'k-pop' | 'admin';
   soloCosplayFinished?: boolean;
   teamCosplayFinished?: boolean;
-  kpopFinished?: boolean;
+  kPopFinished?: boolean;
 }

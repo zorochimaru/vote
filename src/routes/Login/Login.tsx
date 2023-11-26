@@ -27,7 +27,7 @@ const Login = () => {
           email: logedUser.user.email || '',
           role: 'cosplay',
           soloCosplayFinished: false,
-          kpopFinished: false,
+          kPopFinished: false,
           teamCosplayFinished: false
         };
         await setDoc(userDocumentRef(logedUser.user.email || 'anon'), newUser);

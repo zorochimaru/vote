@@ -26,7 +26,8 @@ const Home = () => {
           )}
         </>
       )}
-      {(user?.role === 'k-pop' || user?.role === 'admin') && (
+
+      {(user?.role === 'k-pop' || user?.role === 'admin') && !user.kPopFinished && (
         <Link to="/k-pop-vote">
           <div className={classes.voteItem}>
             <Icon size={40} icon="artist" />
@@ -34,7 +35,7 @@ const Home = () => {
           </div>
         </Link>
       )}
-      {((user?.soloCosplayFinished && user.teamCosplayFinished) || user?.kpopFinished) && (
+      {((user?.soloCosplayFinished && user.teamCosplayFinished) || user?.kPopFinished) && (
         <Link to="/results">
           <div className={classes.voteItem}>
             <Icon size={40} icon="trophy" />

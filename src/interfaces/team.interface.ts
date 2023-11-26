@@ -1,8 +1,8 @@
-import { Character } from '.';
-
 export interface Team {
-  name: string;
-  image: string;
   orderNumber: number;
-  persons: Character[];
+  name: string;
+  fandom: string;
+  fandomType: string;
+  costumeType: string;
+  image: string;
 }

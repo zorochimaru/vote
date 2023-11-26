@@ -1,4 +1,8 @@
-import { kPopTeamCriteriaCollectionRef, kPopTeamsCollectionRef } from '../../../firebase';
+import {
+  kPopTeamCriteriaCollectionRef,
+  kPopTeamResultsCollectionRef,
+  kPopTeamsCollectionRef
+} from '../../../firebase';
 import CharachterPick from '../../components/CharachterPick/CharachterPick';
 import CriteriaList from '../../components/CriteriaList/CriteriaList';
 import InfoRow from '../../components/InfoRow/InfoRow';
@@ -21,7 +25,7 @@ const KPopVote = () => {
   ] = useVote<KpopFirestore>(
     kPopTeamsCollectionRef,
     kPopTeamCriteriaCollectionRef,
-    kPopTeamCriteriaCollectionRef
+    kPopTeamResultsCollectionRef
   );
 
   return (
@@ -47,13 +51,13 @@ const KPopVote = () => {
           )}
         </div>
         <div className={classes.avatar}>
-          <img src={selectedCharachter?.image} alt={selectedCharachter?.name} />
+          <img src={'gs.logo.white-mini.png'} alt={selectedCharachter?.name} />
         </div>
         <div className={classes.info}>
           <h2>Description</h2>
 
           <InfoRow label="Name" value={selectedCharachter?.name || ''} />
-          <InfoRow label="Track" value={selectedCharachter?.trackName || ''} />
+          <InfoRow label="Person Count" value={selectedCharachter?.personCount || 0} />
         </div>
       </div>
 

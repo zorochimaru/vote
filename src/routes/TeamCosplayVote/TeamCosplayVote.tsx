@@ -5,6 +5,7 @@ import {
 } from '../../../firebase';
 import CharachterPick from '../../components/CharachterPick/CharachterPick';
 import CriteriaList from '../../components/CriteriaList/CriteriaList';
+import InfoRow from '../../components/InfoRow/InfoRow';
 import { useVote } from '../../hooks/useVote';
 import { TeamFirestore } from '../../interfaces';
 import classes from '../../styles/vote-page.module.css';
@@ -57,13 +58,10 @@ const TeamCosplayVote = () => {
         </div>
         <div className={classes.info}>
           <h2>Description</h2>
-          {/* TODO: better UI for chars */}
-          {/* <InfoRow label="Char name" value={selectedCharachter?.characterName || ''} />
-          <InfoRow label="Real Name" value={selectedCharachter?.name || ''} />
+          <InfoRow label="Name" value={selectedCharachter?.name || ''} />
           <InfoRow label="Fandom" value={selectedCharachter?.fandom || ''} />
           <InfoRow label="Fandom Type" value={selectedCharachter?.fandomType || ''} />
-          <InfoRow label="Self made" value={selectedCharachter?.selfMade || false} />
-          <InfoRow label="Description" value={selectedCharachter?.description || ''} /> */}
+          <InfoRow label="Costume Type" value={selectedCharachter?.costumeType || ''} />
         </div>
       </div>
 

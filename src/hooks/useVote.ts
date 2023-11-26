@@ -10,7 +10,12 @@ import { useCallback, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { userDocumentRef } from '../../firebase';
 import { useUser } from '../contexts/AuthContext';
-import { BasicLibFirestore, CommonFirestoreWithOrder, Rate } from '../interfaces';
+import {
+  BasicLibFirestore,
+  CommonFirestoreWithOrder,
+  FirestoreCollections,
+  Rate
+} from '../interfaces';
 import { getList } from '../services/firestore.service';
 
 export const useVote = <T extends CommonFirestoreWithOrder>(
@@ -41,8 +46,8 @@ export const useVote = <T extends CommonFirestoreWithOrder>(
 
   const selectedCharactersRate = useCallback(
     (criteriaId: string): number => {
-      const res = rateResults.has(selectedCharacter!.id)
-        ? rateResults.get(selectedCharacter!.id)!
+      const res = rateResults.has(selectedCharacter?.id || '')
+        ? rateResults.get(selectedCharacter?.id || '')!
         : [];
       return res.find((x) => x.criteriaId === criteriaId)?.value || 0;
     },
@@ -89,6 +94,7 @@ export const useVote = <T extends CommonFirestoreWithOrder>(
   const handleSubmit = () => {
     confirm()
       .then(() => {
+        console.log('Submit');
         saveResults();
       })
       .catch(() => {});
@@ -107,20 +113,20 @@ export const useVote = <T extends CommonFirestoreWithOrder>(
       }
 
       switch (personsCollectionRef.id) {
-        case 'soloCosplayPersons':
+        case FirestoreCollections.soloCosplayPersons:
           updateDoc(userDocumentRef(user!.id), { soloCosplayFinished: true });
           break;
-        case 'cosplayTeam':
+        case FirestoreCollections.cosplayTeams:
           updateDoc(userDocumentRef(user!.id), { teamCosplayFinished: true });
           break;
-        case 'kPopTeams':
+        case FirestoreCollections.kPopTeams:
           updateDoc(userDocumentRef(user!.id), { kPopFinished: true });
           break;
         default:
           break;
       }
 
-      sessionStorage.removeItem(`${personsCollectionRef.id}`);
+      localStorage.removeItem(`${personsCollectionRef.id}`);
       navigate('/');
     } catch (error) {
       console.error(error);
@@ -129,23 +135,24 @@ export const useVote = <T extends CommonFirestoreWithOrder>(
 
   const patchResults = useCallback(
     (criteriaId: string, criteria: string, value: number) => {
-      if (rateResults.has(selectedCharacter!.id)) {
-        const currRes = rateResults.get(selectedCharacter!.id)!;
+      if (rateResults.has(selectedCharacter?.id || '')) {
+        const currRes = rateResults.get(selectedCharacter?.id || '')!;
         const currCriteriaRes = currRes.findIndex((x) => x.criteriaId === criteriaId);
         if (currCriteriaRes !== -1) {
           currRes.splice(currCriteriaRes, 1, { criteriaId, value, criteria });
-          setRateResults((prev) => new Map(prev.set(selectedCharacter!.id, [...currRes])));
+          setRateResults((prev) => new Map(prev.set(selectedCharacter?.id || '', [...currRes])));
         } else {
           setRateResults(
             (prev) =>
               new Map(
-                prev.set(selectedCharacter!.id, [...currRes, { criteriaId, value, criteria }])
+                prev.set(selectedCharacter?.id || '', [...currRes, { criteriaId, value, criteria }])
               )
           );
         }
       } else {
         setRateResults(
-          (prev) => new Map(prev.set(selectedCharacter!.id, [{ criteriaId, value, criteria }]))
+          (prev) =>
+            new Map(prev.set(selectedCharacter?.id || '', [{ criteriaId, value, criteria }]))
         );
       }
     },
@@ -172,7 +179,7 @@ export const useVote = <T extends CommonFirestoreWithOrder>(
   }, [characters, rateResults, cosplayCriteria]);
 
   useEffect(() => {
-    const tempResults = sessionStorage.getItem(`${personsCollectionRef.id}`);
+    const tempResults = localStorage.getItem(`${personsCollectionRef.id}`);
     const arrayResults: [string, Rate[]] = JSON.parse(tempResults || '[]');
     if (arrayResults.length) {
       const tempRes = new Map();
@@ -184,7 +191,7 @@ export const useVote = <T extends CommonFirestoreWithOrder>(
   }, [personsCollectionRef]);
 
   useEffect(() => {
-    sessionStorage.setItem(`${personsCollectionRef.id}`, JSON.stringify([...rateResults]));
+    localStorage.setItem(`${personsCollectionRef.id}`, JSON.stringify([...rateResults]));
   }, [rateResults, personsCollectionRef]);
 
   return [

@@ -34,14 +34,16 @@ const SoloCosplayVote = () => {
         <div className={classes.rating}>
           <h2>Rating</h2>
           <div className={classes.questionsWrapper}>
-            {soloCosplayCriteria?.map((criteria) => (
-              <CriteriaList
-                key={criteria.id}
-                label={criteria.label}
-                value={selectedCharachtersRate(criteria.id)}
-                onChange={(value) => patchResults(criteria.id, criteria.label, value)}
-              />
-            ))}
+            {soloCosplayCriteria
+              ?.sort((a, b) => a.order - b.order)
+              ?.map((criteria) => (
+                <CriteriaList
+                  key={criteria.id}
+                  label={criteria.label}
+                  value={selectedCharachtersRate(criteria.id)}
+                  onChange={(value) => patchResults(criteria.id, criteria.label, value)}
+                />
+              ))}
           </div>
 
           {showSubmitButton && (
@@ -55,12 +57,10 @@ const SoloCosplayVote = () => {
         </div>
         <div className={classes.info}>
           <h2>Description</h2>
-          <InfoRow label="Char name" value={selectedCharachter?.characterName || ''} />
-          <InfoRow label="Real Name" value={selectedCharachter?.name || ''} />
+          <InfoRow label="Name" value={selectedCharachter?.name || ''} />
           <InfoRow label="Fandom" value={selectedCharachter?.fandom || ''} />
           <InfoRow label="Fandom Type" value={selectedCharachter?.fandomType || ''} />
-          <InfoRow label="Self made" value={selectedCharachter?.selfMade || false} />
-          <InfoRow label="Description" value={selectedCharachter?.description || ''} />
+          <InfoRow label="Costume Type" value={selectedCharachter?.costumeType || ''} />
         </div>
       </div>
 
