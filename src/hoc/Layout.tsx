@@ -11,7 +11,7 @@ const Layout = () => {
   useEffect(() => {
     auth.onAuthStateChanged((user) => {
       if (user) {
-        localStorage.setItem('user', JSON.stringify(user.uid));
+        localStorage.setItem('user', JSON.stringify(user.email));
       } else {
         setUser(null);
         localStorage.removeItem('user');
