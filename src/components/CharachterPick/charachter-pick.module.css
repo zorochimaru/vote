@@ -15,6 +15,7 @@
   transform: scale(1.2);
   filter: saturate(2);
   background-color: var(--primary-color);
+  z-index: 1;
 }
 
 .charContainer img {
@@ -30,7 +31,7 @@
 .orderNumber {
   position: absolute;
   bottom: 4px;
-  font-size: 30px;
+  font-size: 2rem;
   left: 10px;
   padding: 5px 10px;
   border-radius: 8px;

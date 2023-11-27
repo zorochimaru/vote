@@ -30,7 +30,8 @@ const Header = () => {
     <header>
       <nav>
         <Link className="logo" to="/">
-          <img src="gs.logo.white.png" alt="logo" />
+          <img className="logoImg" src="gs.logo.white.png" alt="logo" />
+          <img className="mobLogo" src="gs.logo.white-mini.png" alt="logo" />
         </Link>
         <ul>
           {user?.canUpload && (

@@ -12,9 +12,16 @@ const CharachterPick = <T extends CommonVote>({
   character: T;
   onClick: (character: T) => void;
 }) => {
+  const scrollToTop = () => {
+    window.scrollTo({ top: 0, left: 0, behavior: 'smooth' });
+  };
+
   return (
     <button
-      onClick={() => onClick(character)}
+      onClick={() => {
+        scrollToTop();
+        onClick(character);
+      }}
       className={`${classes.charContainer} ${isActive && classes.isActive} ${
         rated && classes.rated
       }`}>

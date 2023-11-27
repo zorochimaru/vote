@@ -10,6 +10,9 @@
   font-family: 'BruceForever';
   src: url('assets/fonts/BruceForeverRegular.ttf') format('truetype');
 }
+html {
+  font-size: 16px;
+}
 
 body {
   margin: 0;

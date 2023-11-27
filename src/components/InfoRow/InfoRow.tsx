@@ -7,7 +7,7 @@ const InfoRow: FunctionComponent<{ label: string; value: string | boolean | numb
 }) => {
   return (
     <div className={classes.row}>
-      <div className={classes.column}>{label}</div>
+      <div className={classes.column}>{label}:&nbsp;</div>
       <div className={classes.column}>
         {typeof value === 'boolean' ? (value ? 'yes' : 'no') : value}
       </div>

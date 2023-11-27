@@ -18,6 +18,7 @@ const CriteriaList: FunctionComponent<{
       <div className={classes.column}>{label}</div>
       <div className={classes.column}>
         <Rating
+          size="large"
           name="rating"
           value={rate}
           onChange={(_event, newValue) => {
