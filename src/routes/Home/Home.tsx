@@ -27,7 +27,7 @@ const Home = () => {
         </>
       )}
 
-      {(user?.role === 'k-pop' || user?.role === 'admin') && !user.kPopFinished && (
+      {(user?.role === 'kPop' || user?.role === 'admin') && !user.kPopFinished && (
         <Link to="/k-pop-vote">
           <div className={classes.voteItem}>
             <Icon size={40} icon="artist" />

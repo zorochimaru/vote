@@ -16,7 +16,7 @@ const Header = () => {
   const canSeeResultsLink = useCallback((): boolean => {
     return (
       (user?.role === 'cosplay' && user?.soloCosplayFinished && user?.teamCosplayFinished) ||
-      (user?.role === 'k-pop' && user?.kPopFinished) ||
+      (user?.role === 'kPop' && user?.kPopFinished) ||
       false
     );
   }, [user]);

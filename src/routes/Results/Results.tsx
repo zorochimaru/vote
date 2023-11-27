@@ -18,7 +18,7 @@ const Results = () => {
           <ResultsTable collectionRef={cosplayTeamResultsCollectionRef} />
         </>
       )}
-      {(user?.role === 'k-pop' || user?.role === 'admin') && (
+      {(user?.role === 'kPop' || user?.role === 'admin') && (
         <>
           <h1>K-Pop Results:</h1>
           <ResultsTable collectionRef={kPopTeamResultsCollectionRef} />

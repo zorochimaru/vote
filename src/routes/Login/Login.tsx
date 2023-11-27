@@ -17,7 +17,7 @@ const Login = () => {
     try {
       const logedUser = await signInWithEmailAndPassword(auth, email, password);
       const authUser = await getDocument<AuthUser>(
-        doc(firestore, `authUsers/${logedUser.user.uid}`)
+        doc(firestore, `authUsers/${logedUser.user.email}`)
       );
       if (authUser) {
         setUser(authUser);
