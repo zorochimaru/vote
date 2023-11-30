@@ -35,7 +35,7 @@ const Home = () => {
           </div>
         </Link>
       )}
-      {((user?.soloCosplayFinished && user.teamCosplayFinished) || user?.kPopFinished) && (
+      {(user?.soloCosplayFinished || user?.teamCosplayFinished || user?.kPopFinished) && (
         <Link to="/results">
           <div className={classes.voteItem}>
             <Icon size={40} icon="trophy" />

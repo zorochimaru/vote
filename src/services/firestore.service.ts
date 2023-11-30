@@ -1,4 +1,6 @@
-import { CollectionReference, DocumentReference, getDoc, getDocs } from 'firebase/firestore';
+import { CollectionReference, DocumentReference, doc, getDoc, getDocs } from 'firebase/firestore';
+import { firestore } from '../../firebase';
+import { FirestoreCollections } from '../interfaces';
 
 export const getList = async <T>(
   collectionRef: CollectionReference,
@@ -15,3 +17,6 @@ export const getDocument = async <T>(documentRef: DocumentReference): Promise<T 
   const doc = await getDoc(documentRef);
   return doc.exists() ? ({ id: doc.id, ...doc.data() } as T) : null;
 };
+
+export const getDocumentRef = (collectionRef: FirestoreCollections, id: string) =>
+  doc(firestore, collectionRef, id);

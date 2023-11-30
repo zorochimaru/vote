@@ -1,9 +1,19 @@
 .wrapper {
   display: flex;
   flex-direction: column;
+  position: relative;
   height: calc(100dvh - 156px);
   container-type: inline-size;
   container-name: wrapper;
+}
+
+.outline {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  place-items: center;
+  z-index: 2;
+  background-color: rgba(0, 0, 0, 0.7);
 }
 
 h2 {

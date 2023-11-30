@@ -7,7 +7,7 @@ import Layout from './hoc/Layout';
 import { ThemeProvider, createTheme } from '@mui/material/styles';
 import { onSnapshot } from 'firebase/firestore';
 import { ConfirmProvider } from 'material-ui-confirm';
-import { userDocumentRef } from '../firebase';
+import { auth, userDocumentRef } from '../firebase';
 import Loading from './components/Loading/Loading';
 import { AuthUser } from './interfaces';
 
@@ -17,7 +17,7 @@ const Results = lazy(() => import('./routes/Results/Results'));
 const SoloCosplayVote = lazy(() => import('./routes/SoloCosplayVote/SoloCosplayVote'));
 const Login = lazy(() => import('./routes/Login/Login'));
 const Home = lazy(() => import('./routes/Home/Home'));
-const UploadCharacters = lazy(() => import('./routes/UploadCharacters/UploadCharacters'));
+const AdminPanel = lazy(() => import('./routes/AdminPanel/AdminPanel'));
 
 const darkTheme = createTheme({
   palette: {
@@ -34,14 +34,19 @@ export const App = () => {
     });
 
     return () => {
+      console.log(`unsubscribed!`);
       unsubscribe();
     };
   }, []);
 
   useEffect(() => {
-    if (localStorage.getItem('user')) {
-      getUser(JSON.parse(localStorage.getItem('user')!));
-    }
+    auth.onAuthStateChanged((user) => {
+      if (user) {
+        getUser(user.email!);
+      } else {
+        setUser(null);
+      }
+    });
   }, [getUser]);
 
   const userFactory = useMemo<UserFactory>(() => ({ user, setUser }), [user, setUser]);
@@ -61,7 +66,7 @@ export const App = () => {
                     <Route path="team-cosplay-vote" element={<TeamCosplayVote />} />
                     <Route path="k-pop-vote" element={<KPopVote />} />
                     <Route path="results" element={<Results />} />
-                    <Route path="upload-characters" element={<UploadCharacters />} />
+                    <Route path="admin-panel" element={<AdminPanel />} />
                     <Route path="*" element={<div>404</div>} />
                   </Route>
                 </Route>

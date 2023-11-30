@@ -1,7 +1,7 @@
 import { initializeApp } from 'firebase/app';
 import { getAuth } from 'firebase/auth';
 
-import { collection, doc, getFirestore } from 'firebase/firestore';
+import { collection, doc, initializeFirestore } from 'firebase/firestore';
 import { FirestoreCollections } from './src/interfaces';
 
 const firebaseConfig = {
@@ -16,7 +16,9 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 
 export const auth = getAuth(app);
-export const firestore = getFirestore(app);
+export const firestore = initializeFirestore(app, {
+  experimentalForceLongPolling: true
+});
 
 export const userDocumentRef = (uid: string) => doc(firestore, `authUsers`, uid);
 

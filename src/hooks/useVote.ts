@@ -10,6 +10,7 @@ import { useCallback, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { userDocumentRef } from '../../firebase';
 import { useUser } from '../contexts/AuthContext';
+import { useLoading } from '../contexts/LoadingContext';
 import {
   BasicLibFirestore,
   CommonFirestoreWithOrder,
@@ -37,7 +38,7 @@ export const useVote = <T extends CommonFirestoreWithOrder>(
   const { user } = useUser();
   const confirm = useConfirm();
   const navigate = useNavigate();
-
+  const { setLoading } = useLoading();
   const [selectedCharacter, setSelectedCharachter] = useState<T>();
   const [characters, setCharacters] = useState<T[]>([]);
   const [cosplayCriteria, setSoloCosplayCriteria] = useState<BasicLibFirestore[]>([]);
@@ -91,19 +92,20 @@ export const useVote = <T extends CommonFirestoreWithOrder>(
     [rateResults, cosplayCriteria]
   );
 
-  const handleSubmit = () => {
-    confirm()
-      .then(() => {
-        console.log('Submit');
-        saveResults();
-      })
-      .catch(() => {});
+  const handleSubmit = async () => {
+    try {
+      await confirm();
+      await saveResults();
+    } catch (error) {
+      console.error(error);
+    }
   };
 
   const saveResults = useCallback(async () => {
+    setLoading(true);
     try {
       for (const [personId, results] of [...rateResults.entries()]) {
-        addDoc(resultsCollectionRef, {
+        await addDoc(resultsCollectionRef, {
           createdAt: serverTimestamp(),
           createdBy: user?.id,
           personId,
@@ -114,24 +116,34 @@ export const useVote = <T extends CommonFirestoreWithOrder>(
 
       switch (personsCollectionRef.id) {
         case FirestoreCollections.soloCosplayPersons:
-          updateDoc(userDocumentRef(user!.id), { soloCosplayFinished: true });
+          await updateDoc(userDocumentRef(user!.id), { soloCosplayFinished: true });
           break;
         case FirestoreCollections.cosplayTeams:
-          updateDoc(userDocumentRef(user!.id), { teamCosplayFinished: true });
+          await updateDoc(userDocumentRef(user!.id), { teamCosplayFinished: true });
           break;
         case FirestoreCollections.kPopTeams:
-          updateDoc(userDocumentRef(user!.id), { kPopFinished: true });
+          await updateDoc(userDocumentRef(user!.id), { kPopFinished: true });
           break;
         default:
           break;
       }
 
       localStorage.removeItem(`${personsCollectionRef.id}`);
+      setLoading(false);
       navigate('/');
     } catch (error) {
+      setLoading(false);
       console.error(error);
     }
-  }, [rateResults, user, personsCollectionRef, resultsCollectionRef, navigate, characters]);
+  }, [
+    rateResults,
+    user,
+    personsCollectionRef,
+    resultsCollectionRef,
+    navigate,
+    characters,
+    setLoading
+  ]);
 
   const patchResults = useCallback(
     (criteriaId: string, criteria: string, value: number) => {

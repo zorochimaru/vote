@@ -19,18 +19,28 @@ import {
   Radio,
   RadioGroup
 } from '@mui/material';
-import { addDoc, serverTimestamp } from 'firebase/firestore';
+import { addDoc, deleteDoc, serverTimestamp, updateDoc } from 'firebase/firestore';
+import { useConfirm } from 'material-ui-confirm';
 import {
+  authUsersCollectionRef,
+  cosplayTeamResultsCollectionRef,
   cosplayTeamsCollectionRef,
+  kPopTeamResultsCollectionRef,
   kPopTeamsCollectionRef,
-  soloCosplayPersonsCollectionRef
+  soloCosplayPersonsCollectionRef,
+  soloCosplayResultsCollectionRef
 } from '../../../firebase';
 import { useUser } from '../../contexts/AuthContext';
-import { CommonVote, FirestoreCollections } from '../../interfaces';
-import classes from './upload-characters.module.css';
+import { useLoading } from '../../contexts/LoadingContext';
+import { AuthUser, CommonVote, FirestoreCollections } from '../../interfaces';
+import { ResultFirestore } from '../../interfaces/result-firestore.interface';
+import { getDocumentRef, getList } from '../../services/firestore.service';
+import classes from './admin-panel.module.css';
 
-const UploadCharacters = () => {
+const AdminPanel = () => {
   const [type, setType] = useState<FirestoreCollections>(FirestoreCollections.soloCosplayPersons);
+  const { setLoading } = useLoading();
+  const confirm = useConfirm();
 
   const handleTypeChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setType((event.target as HTMLInputElement).value as FirestoreCollections);
@@ -95,6 +105,39 @@ const UploadCharacters = () => {
     });
   };
 
+  const resetResults = async () => {
+    try {
+      await confirm();
+      setLoading(true);
+      const soloResults = await getList<ResultFirestore>(soloCosplayResultsCollectionRef);
+      const teamResults = await getList<ResultFirestore>(cosplayTeamResultsCollectionRef);
+      const kpopResults = await getList<ResultFirestore>(kPopTeamResultsCollectionRef);
+      const users = await getList<AuthUser>(authUsersCollectionRef);
+
+      for (const result of soloResults) {
+        await deleteDoc(getDocumentRef(FirestoreCollections.soloCosplayResults, result.id));
+      }
+      for (const result of teamResults) {
+        await deleteDoc(getDocumentRef(FirestoreCollections.cosplayTeamResults, result.id));
+      }
+      for (const result of kpopResults) {
+        await deleteDoc(getDocumentRef(FirestoreCollections.kPopTeamResults, result.id));
+      }
+
+      for (const user of users) {
+        await updateDoc(getDocumentRef(FirestoreCollections.authUsers, user.email), {
+          soloCosplayFinished: false,
+          teamCosplayFinished: false,
+          kPopFinished: false
+        });
+      }
+      setLoading(false);
+    } catch (error) {
+      setLoading(false);
+      console.error(error);
+    }
+  };
+
   return (
     <div className={classes.wrapper}>
       <Paper
@@ -150,6 +193,9 @@ const UploadCharacters = () => {
             </RadioGroup>
           </FormControl>
         </div>
+        <Button onClick={resetResults} component="label" color="error" variant="contained">
+          Reset Results
+        </Button>
 
         {!!rows.length && (
           <Button
@@ -232,4 +278,4 @@ const CharImage: FunctionComponent<{ row: CommonVote }> = ({ row }) => {
   );
 };
 
-export default UploadCharacters;
+export default AdminPanel;
