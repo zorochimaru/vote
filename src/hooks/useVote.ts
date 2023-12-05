@@ -41,7 +41,7 @@ export const useVote = <T extends CommonFirestoreWithOrder>(
   const { setLoading } = useLoading();
   const [selectedCharacter, setSelectedCharachter] = useState<T>();
   const [characters, setCharacters] = useState<T[]>([]);
-  const [cosplayCriteria, setSoloCosplayCriteria] = useState<BasicLibFirestore[]>([]);
+  const [criteria, setCriteria] = useState<BasicLibFirestore[]>([]);
   const [rateResults, setRateResults] = useState<Map<string, Rate[]>>(new Map());
   const [showSubmitButton, setShowSubmitButton] = useState<boolean>(false);
 
@@ -68,7 +68,7 @@ export const useVote = <T extends CommonFirestoreWithOrder>(
   const fetchCriteria = useCallback(async () => {
     try {
       const criteria = await getList<BasicLibFirestore>(criteriaCollectionRef);
-      setSoloCosplayCriteria(criteria);
+      setCriteria(criteria);
     } catch (error) {
       console.error(error);
     }
@@ -87,9 +87,9 @@ export const useVote = <T extends CommonFirestoreWithOrder>(
 
   const isRated = useCallback(
     (id: string): boolean => {
-      return rateResults.has(id) && [...rateResults.get(id)!].length === cosplayCriteria.length;
+      return rateResults.has(id) && [...rateResults.get(id)!].length === criteria.length;
     },
-    [rateResults, cosplayCriteria]
+    [rateResults, criteria]
   );
 
   const handleSubmit = async () => {
@@ -179,16 +179,16 @@ export const useVote = <T extends CommonFirestoreWithOrder>(
   useEffect(() => {
     const allCharsHasFilled =
       characters.length === rateResults.size &&
-      [...rateResults.values()].every((x) => x.length === cosplayCriteria.length);
+      [...rateResults.values()].every((x) => x.length === criteria.length);
     setShowSubmitButton(allCharsHasFilled);
-  }, [characters, rateResults, cosplayCriteria]);
+  }, [characters, rateResults, criteria]);
 
   useEffect(() => {
     const allCharsHasFilled =
       characters.length === rateResults.size &&
-      [...rateResults.values()].every((x) => x.length === cosplayCriteria.length);
+      [...rateResults.values()].every((x) => x.length === criteria.length);
     setShowSubmitButton(allCharsHasFilled);
-  }, [characters, rateResults, cosplayCriteria]);
+  }, [characters, rateResults, criteria]);
 
   useEffect(() => {
     const tempResults = localStorage.getItem(`${personsCollectionRef.id}`);
@@ -213,7 +213,7 @@ export const useVote = <T extends CommonFirestoreWithOrder>(
     isActiveCharacter,
     selectedCharactersRate,
     isRated,
-    cosplayCriteria,
+    criteria,
     patchResults,
     showSubmitButton,
     handleSubmit

@@ -61,7 +61,6 @@ const TeamCosplayVote = () => {
           <InfoRow label="Name" value={selectedCharachter?.name || ''} />
           <InfoRow label="Fandom" value={selectedCharachter?.fandom || ''} />
           <InfoRow label="Fandom Type" value={selectedCharachter?.fandomType || ''} />
-          <InfoRow label="Costume Type" value={selectedCharachter?.costumeType || ''} />
         </div>
       </div>
 

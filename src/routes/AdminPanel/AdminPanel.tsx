@@ -16,34 +16,49 @@ import {
   FormControlLabel,
   FormLabel,
   Radio,
-  RadioGroup
+  RadioGroup,
+  TextField
 } from '@mui/material';
 import { addDoc, deleteDoc, serverTimestamp, updateDoc } from 'firebase/firestore';
 import { useConfirm } from 'material-ui-confirm';
 import {
   authUsersCollectionRef,
+  cosplayTeamCriteriaCollectionRef,
   cosplayTeamResultsCollectionRef,
   cosplayTeamsCollectionRef,
+  kPopTeamCriteriaCollectionRef,
   kPopTeamResultsCollectionRef,
   kPopTeamsCollectionRef,
+  soloCosplayCriteriaCollectionRef,
   soloCosplayPersonsCollectionRef,
   soloCosplayResultsCollectionRef
 } from '../../../firebase';
 import ZoomImage from '../../components/ZoomImage/ZoomImage';
 import { useUser } from '../../contexts/AuthContext';
 import { useLoading } from '../../contexts/LoadingContext';
-import { AuthUser, CommonVote, FirestoreCollections } from '../../interfaces';
+import { AuthUser, BasicLibFirestore, CommonVote, FirestoreCollections } from '../../interfaces';
 import { ResultFirestore } from '../../interfaces/result-firestore.interface';
 import { getDocumentRef, getList } from '../../services/firestore.service';
 import classes from './admin-panel.module.css';
 
 const AdminPanel = () => {
   const [type, setType] = useState<FirestoreCollections>(FirestoreCollections.soloCosplayPersons);
+  const [criteriaType, setCriteriaType] = useState<FirestoreCollections>(
+    FirestoreCollections.soloCosplayCriteria
+  );
+  const [criteriaLabel, setCriteriaLabel] = useState('');
+  const [criteriaList, setCriteriaList] = useState<BasicLibFirestore[]>([]);
+  const [updatedCriteriaId, setUpdatedCriteriaId] = useState('');
+
   const { setLoading } = useLoading();
   const confirm = useConfirm();
 
   const handleTypeChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setType((event.target as HTMLInputElement).value as FirestoreCollections);
+  };
+
+  const handleCriteriaTypeChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setCriteriaType((event.target as HTMLInputElement).value as FirestoreCollections);
   };
 
   const [rows, setRows] = useState<CommonVote[]>([]);
@@ -138,6 +153,95 @@ const AdminPanel = () => {
     }
   };
 
+  const fetchCriteria = async () => {
+    try {
+      setLoading(true);
+      let collectionRef = soloCosplayCriteriaCollectionRef;
+      switch (criteriaType) {
+        case FirestoreCollections.soloCosplayCriteria:
+          collectionRef = soloCosplayCriteriaCollectionRef;
+          break;
+        case FirestoreCollections.cosplayTeamCriteria:
+          collectionRef = cosplayTeamCriteriaCollectionRef;
+          break;
+        case FirestoreCollections.kPopTeamCriteria:
+          collectionRef = kPopTeamCriteriaCollectionRef;
+          break;
+
+        default:
+          console.error('Unknown type');
+          break;
+      }
+
+      const criteria = await getList<BasicLibFirestore>(collectionRef);
+      console.log(criteria);
+      setCriteriaList(criteria);
+      setLoading(false);
+    } catch (error) {
+      setLoading(false);
+      console.error(error);
+    }
+  };
+
+  const saveCriteria = async () => {
+    try {
+      setLoading(true);
+
+      if (updatedCriteriaId) {
+        await updateDoc(getDocumentRef(criteriaType, updatedCriteriaId), {
+          label: criteriaLabel
+        });
+      } else {
+        let collectionRef = soloCosplayCriteriaCollectionRef;
+        switch (criteriaType) {
+          case FirestoreCollections.soloCosplayCriteria:
+            collectionRef = soloCosplayCriteriaCollectionRef;
+            break;
+          case FirestoreCollections.cosplayTeamCriteria:
+            collectionRef = cosplayTeamCriteriaCollectionRef;
+            break;
+          case FirestoreCollections.kPopTeamCriteria:
+            collectionRef = kPopTeamCriteriaCollectionRef;
+            break;
+
+          default:
+            console.error('Unknown type');
+            break;
+        }
+
+        await addDoc(collectionRef, {
+          createdAt: serverTimestamp(),
+          createdBy: user?.id,
+          label: criteriaLabel,
+          order: criteriaList.length + 1
+        });
+      }
+      await fetchCriteria();
+      setUpdatedCriteriaId('');
+      setCriteriaLabel('');
+      setLoading(false);
+    } catch (error) {
+      setLoading(false);
+      console.error(error);
+    }
+  };
+
+  const deleteCriteria = async (id: string) => {
+    try {
+      setLoading(true);
+
+      if (updatedCriteriaId) {
+        await deleteDoc(getDocumentRef(criteriaType, id));
+        await fetchCriteria();
+      }
+
+      setLoading(false);
+    } catch (error) {
+      setLoading(false);
+      console.error(error);
+    }
+  };
+
   return (
     <div className={classes.wrapper}>
       <Paper
@@ -168,7 +272,7 @@ const AdminPanel = () => {
             />
           </Button>
           <FormControl>
-            <FormLabel id="demo-radio-buttons-group-label">Type</FormLabel>
+            <FormLabel id="demo-radio-buttons-group-label">List Type</FormLabel>
             <RadioGroup
               value={type}
               onChange={handleTypeChange}
@@ -208,6 +312,90 @@ const AdminPanel = () => {
           </Button>
         )}
       </Paper>
+      <Paper
+        style={{
+          display: 'flex',
+          gap: '20px',
+          marginBottom: '10px',
+          padding: '20px',
+          alignItems: 'flex-start'
+        }}>
+        <FormControl>
+          <FormLabel id="demo-radio-buttons-group-label">Criteria Type</FormLabel>
+          <RadioGroup
+            value={criteriaType}
+            onChange={handleCriteriaTypeChange}
+            aria-labelledby="demo-radio-buttons-group-label"
+            defaultValue={FirestoreCollections.soloCosplayCriteria}
+            name="type">
+            <FormControlLabel
+              value={FirestoreCollections.soloCosplayCriteria}
+              control={<Radio />}
+              label="Solo Cosplay"
+            />
+            <FormControlLabel
+              value={FirestoreCollections.cosplayTeamCriteria}
+              control={<Radio />}
+              label="Team Cosplay"
+            />
+            <FormControlLabel
+              value={FirestoreCollections.kPopTeamCriteria}
+              control={<Radio />}
+              label="K-Pop"
+            />
+          </RadioGroup>
+        </FormControl>
+        <Button onClick={fetchCriteria}>Fetch criteria</Button>
+        <TextField
+          id="outlined-basic"
+          value={criteriaLabel}
+          onChange={(e) => setCriteriaLabel(e.target.value.trim())}
+          label="Criteria label"
+          variant="outlined"
+        />
+        <Button onClick={saveCriteria}>Save criteria</Button>
+      </Paper>
+
+      {!!criteriaList.length && (
+        <Container maxWidth="md">
+          <TableContainer component={Paper}>
+            <Table sx={{ minWidth: 150 }} aria-label="simple table">
+              <TableHead>
+                <TableRow>
+                  <TableCell>Label</TableCell>
+                  <TableCell align="right"></TableCell>
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                {criteriaList
+                  .sort((x) => x.order)
+                  .map((row) => (
+                    <TableRow
+                      key={row.id}
+                      sx={{ '&:last-child td, &:last-child th': { border: 0 } }}>
+                      <TableCell component="th" scope="row">
+                        {row.label}
+                      </TableCell>
+                      <TableCell component="th" align="right" scope="row">
+                        <Button
+                          onClick={() => {
+                            setUpdatedCriteriaId(row.id);
+                            setCriteriaLabel(row.label);
+                          }}>
+                          Edit
+                        </Button>
+                        <Button color="error" onClick={() => deleteCriteria(row.id)}>
+                          Delete
+                        </Button>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+              </TableBody>
+            </Table>
+          </TableContainer>
+        </Container>
+      )}
+
       {!!rows.length && (
         <Container maxWidth="md">
           <TableContainer component={Paper}>
