@@ -1,14 +1,13 @@
 import UploadIcon from '@mui/icons-material/Upload';
 import Button from '@mui/material/Button';
 import Paper from '@mui/material/Paper';
-import Popover from '@mui/material/Popover';
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
 import TableCell from '@mui/material/TableCell';
 import TableContainer from '@mui/material/TableContainer';
 import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
-import { FunctionComponent, useState } from 'react';
+import { useState } from 'react';
 import * as XLSX from 'xlsx';
 
 import {
@@ -30,6 +29,7 @@ import {
   soloCosplayPersonsCollectionRef,
   soloCosplayResultsCollectionRef
 } from '../../../firebase';
+import ZoomImage from '../../components/ZoomImage/ZoomImage';
 import { useUser } from '../../contexts/AuthContext';
 import { useLoading } from '../../contexts/LoadingContext';
 import { AuthUser, CommonVote, FirestoreCollections } from '../../interfaces';
@@ -226,8 +226,8 @@ const AdminPanel = () => {
                     <TableCell component="th" scope="row">
                       {row.name}
                     </TableCell>
-                    <TableCell align="right">
-                      <CharImage row={row} />
+                    <TableCell className={classes.imageCell} align="right">
+                      <ZoomImage url={row.image || ''} />
                     </TableCell>
                   </TableRow>
                 ))}
@@ -237,44 +237,6 @@ const AdminPanel = () => {
         </Container>
       )}
     </div>
-  );
-};
-
-const CharImage: FunctionComponent<{ row: CommonVote }> = ({ row }) => {
-  const [anchorEl, setAnchorEl] = useState<HTMLButtonElement | null>(null);
-
-  const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
-    setAnchorEl(event.currentTarget);
-  };
-
-  const handleClose = () => {
-    setAnchorEl(null);
-  };
-
-  const open = Boolean(anchorEl);
-  const id = open ? 'simple-popover' : undefined;
-
-  return (
-    <>
-      <button aria-describedby={id} className={classes.charImage} onClick={handleClick}>
-        <img height={80} src={row.image || 'gs.logo.white-mini.png'} alt="" />
-      </button>
-      <Popover
-        id={id}
-        open={open}
-        anchorOrigin={{
-          vertical: 'bottom',
-          horizontal: 'left'
-        }}
-        anchorEl={anchorEl}
-        onClose={handleClose}
-        transformOrigin={{
-          vertical: 'top',
-          horizontal: 'left'
-        }}>
-        <img width={300} src={row.image || 'gs.logo.white-mini.png'} alt="" />
-      </Popover>
-    </>
   );
 };
 

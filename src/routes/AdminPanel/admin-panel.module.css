@@ -1,5 +1,3 @@
-.charImage {
-  border: 0;
-  padding: 0;
-  cursor: pointer;
+.imageCell img {
+  max-width: 100px;
 }

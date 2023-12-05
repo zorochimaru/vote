@@ -6,6 +6,7 @@ import {
 import CharachterPick from '../../components/CharachterPick/CharachterPick';
 import CriteriaList from '../../components/CriteriaList/CriteriaList';
 import InfoRow from '../../components/InfoRow/InfoRow';
+import ZoomImage from '../../components/ZoomImage/ZoomImage';
 import { useVote } from '../../hooks/useVote';
 import { CharacterFirestore } from '../../interfaces';
 import classes from '../../styles/vote-page.module.css';
@@ -13,7 +14,7 @@ import classes from '../../styles/vote-page.module.css';
 const SoloCosplayVote = () => {
   const [
     characters,
-    selectedCharachter,
+    selectedCharacter,
     setCharacter,
     isActiveCharacter,
     selectedCharachtersRate,
@@ -53,14 +54,14 @@ const SoloCosplayVote = () => {
           )}
         </div>
         <div className={classes.avatar}>
-          <img src={selectedCharachter?.image} alt={selectedCharachter?.name} />
+          <ZoomImage url={selectedCharacter?.image || ''} />
         </div>
         <div className={classes.info}>
           <h2>Description</h2>
-          <InfoRow label="Name" value={selectedCharachter?.name || ''} />
-          <InfoRow label="Fandom" value={selectedCharachter?.fandom || ''} />
-          <InfoRow label="Fandom Type" value={selectedCharachter?.fandomType || ''} />
-          <InfoRow label="Costume Type" value={selectedCharachter?.costumeType || ''} />
+          <InfoRow label="Name" value={selectedCharacter?.name || ''} />
+          <InfoRow label="Fandom" value={selectedCharacter?.fandom || ''} />
+          <InfoRow label="Fandom Type" value={selectedCharacter?.fandomType || ''} />
+          <InfoRow label="Costume Type" value={selectedCharacter?.costumeType || ''} />
         </div>
       </div>
 

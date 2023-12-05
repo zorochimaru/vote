@@ -97,6 +97,8 @@ h2 {
   border-radius: 8px;
   overflow: clip;
   flex-basis: 350px;
+  display: flex;
+  justify-content: center;
 }
 
 .avatar img {
