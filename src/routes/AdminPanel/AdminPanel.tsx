@@ -174,7 +174,6 @@ const AdminPanel = () => {
       }
 
       const criteria = await getList<BasicLibFirestore>(collectionRef);
-      console.log(criteria);
       setCriteriaList(criteria);
       setLoading(false);
     } catch (error) {
@@ -230,10 +229,8 @@ const AdminPanel = () => {
     try {
       setLoading(true);
 
-      if (updatedCriteriaId) {
-        await deleteDoc(getDocumentRef(criteriaType, id));
-        await fetchCriteria();
-      }
+      await deleteDoc(getDocumentRef(criteriaType, id));
+      await fetchCriteria();
 
       setLoading(false);
     } catch (error) {
@@ -384,7 +381,12 @@ const AdminPanel = () => {
                           }}>
                           Edit
                         </Button>
-                        <Button color="error" onClick={() => deleteCriteria(row.id)}>
+                        <Button
+                          color="error"
+                          onClick={() => {
+                            setUpdatedCriteriaId(row.id);
+                            deleteCriteria(row.id);
+                          }}>
                           Delete
                         </Button>
                       </TableCell>

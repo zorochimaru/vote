@@ -34,7 +34,6 @@ export const App = () => {
     });
 
     return () => {
-      console.log(`unsubscribed!`);
       unsubscribe();
     };
   }, []);
