@@ -17,7 +17,7 @@ const TeamCosplayVote = () => {
     selectedCharacter,
     setCharacter,
     isActiveCharacter,
-    selectedCharachtersRate,
+    selectedCharactersRate,
     isRated,
     soloCosplayCriteria,
     patchResults,
@@ -39,7 +39,7 @@ const TeamCosplayVote = () => {
               <CriteriaList
                 key={criteria.id}
                 label={criteria.label}
-                value={selectedCharachtersRate(criteria.id)}
+                value={selectedCharactersRate(criteria.id)}
                 onChange={(value) => patchResults(criteria.id, criteria.label, value)}
               />
             ))}
