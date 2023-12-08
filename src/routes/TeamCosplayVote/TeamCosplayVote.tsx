@@ -14,7 +14,7 @@ import classes from '../../styles/vote-page.module.css';
 const TeamCosplayVote = () => {
   const [
     characters,
-    selectedCharachter,
+    selectedCharacter,
     setCharacter,
     isActiveCharacter,
     selectedCharachtersRate,
@@ -52,13 +52,13 @@ const TeamCosplayVote = () => {
           )}
         </div>
         <div className={classes.avatar}>
-          <ZoomImage url={selectedCharachter?.image || ''} />
+          <ZoomImage url={selectedCharacter?.image || ''} />
         </div>
         <div className={classes.info}>
           <h2>Description</h2>
-          <InfoRow label="Name" value={selectedCharachter?.name || ''} />
-          <InfoRow label="Fandom" value={selectedCharachter?.fandom || ''} />
-          <InfoRow label="Fandom Type" value={selectedCharachter?.fandomType || ''} />
+          <InfoRow label="Name" value={selectedCharacter?.name || ''} />
+          <InfoRow label="Fandom" value={selectedCharacter?.fandom || ''} />
+          <InfoRow label="Fandom Type" value={selectedCharacter?.fandomType || ''} />
         </div>
       </div>
 
