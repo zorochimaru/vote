@@ -6,6 +6,7 @@ import {
 import CharachterPick from '../../components/CharachterPick/CharachterPick';
 import CriteriaList from '../../components/CriteriaList/CriteriaList';
 import InfoRow from '../../components/InfoRow/InfoRow';
+import ZoomImage from '../../components/ZoomImage/ZoomImage';
 import { useVote } from '../../hooks/useVote';
 import { TeamFirestore } from '../../interfaces';
 import classes from '../../styles/vote-page.module.css';
@@ -51,10 +52,7 @@ const TeamCosplayVote = () => {
           )}
         </div>
         <div className={classes.avatar}>
-          <img
-            src={selectedCharachter?.image || 'gs.logo.white-mini.png'}
-            alt={selectedCharachter?.name}
-          />
+          <ZoomImage url={selectedCharachter?.image || ''} />
         </div>
         <div className={classes.info}>
           <h2>Description</h2>
