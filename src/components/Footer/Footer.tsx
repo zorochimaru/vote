@@ -1,7 +1,13 @@
 import './Footer.css';
 
 const Footer = () => {
-  return <footer>©️ me 2023</footer>;
+  return (
+    <footer>
+      <a href="https://github.com/zorochimaru" target="_blank" rel="noopener noreferrer">
+        zorochimaru ©️
+      </a>
+    </footer>
+  );
 };
 
 export default Footer;

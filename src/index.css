@@ -4,8 +4,8 @@
 
   --primary-color: #5996d0;
   --secondary-color: #b652a1;
+  --secondary-color-lighter: #b57ba8;
 }
-
 @font-face {
   font-family: 'BruceForever';
   src: url('assets/fonts/BruceForeverRegular.ttf') format('truetype');
