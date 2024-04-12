@@ -71,6 +71,7 @@ const TeamCosplayVote = () => {
           <CharachterPick
             key={character.id}
             onClick={setCharacter}
+            isWideCard={true}
             rated={isRated(character.id)}
             isActive={isActiveCharacter(character.id)}
             character={character}

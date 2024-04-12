@@ -214,7 +214,6 @@ export const useVote = <T extends CommonFirestoreWithOrder>(
   }, [personsCollectionRef]);
 
   useEffect(() => {
-    console.log(rateResults);
     localStorage.setItem(`${personsCollectionRef.id}`, JSON.stringify([...rateResults]));
   }, [rateResults, personsCollectionRef]);
 

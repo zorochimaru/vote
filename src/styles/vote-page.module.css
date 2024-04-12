@@ -49,6 +49,10 @@ h2 {
   color: #fff;
 }
 
+.skipBtn:active {
+  filter: brightness(1.2);
+}
+
 .submitBtn:disabled {
   opacity: 0.5;
   color: initial;
@@ -118,12 +122,9 @@ button {
 .charsWrapper {
   scrollbar-color: rgb(89, 150, 208) rgba(0, 0, 0, 0.7);
   scrollbar-width: thin;
-  margin-top: auto;
   display: flex;
   flex-wrap: wrap;
   overflow: auto;
-  padding: 8px;
-  max-height: 400px;
 }
 
 @media (max-width: 1440px) {

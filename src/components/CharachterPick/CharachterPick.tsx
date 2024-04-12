@@ -5,12 +5,14 @@ const CharachterPick = <T extends CommonVote>({
   isActive,
   character,
   rated,
-  onClick
+  onClick,
+  isWideCard
 }: {
   isActive?: boolean;
   rated?: boolean;
   character: T;
   onClick: (character: T) => void;
+  isWideCard?: boolean;
 }) => {
   const scrollToTop = () => {
     window.scrollTo({ top: 0, left: 0, behavior: 'smooth' });
@@ -22,9 +24,10 @@ const CharachterPick = <T extends CommonVote>({
         scrollToTop();
         onClick(character);
       }}
-      className={`${classes.charContainer} ${isActive && classes.isActive} ${
-        rated && classes.rated
-      }`}>
+      className={`${classes.charContainer}
+       ${isWideCard && classes.wideCard}
+       ${isActive && classes.isActive}
+      ${rated && classes.rated}`}>
       <span className={classes.orderNumber}>{character.orderNumber}</span>
       <img src={character?.image || 'gs.logo.white-mini.png'} alt={character.name} />
     </button>
