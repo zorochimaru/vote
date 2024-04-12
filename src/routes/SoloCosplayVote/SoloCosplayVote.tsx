@@ -35,6 +35,15 @@ const SoloCosplayVote = () => {
       <div className={classes.descWrapper}>
         <div className={classes.rating}>
           <h2>Rating</h2>
+          {showSubmitButton ? (
+            <button type="button" onClick={handleSubmit} className={classes.submitBtn}>
+              Submit
+            </button>
+          ) : (
+            <button type="button" className={classes.skipBtn} onClick={skipCharacter}>
+              Skip 🙅‍♂️
+            </button>
+          )}
           <div className={classes.questionsWrapper}>
             {soloCosplayCriteria
               ?.sort((a, b) => a.order - b.order)
@@ -46,16 +55,7 @@ const SoloCosplayVote = () => {
                   onChange={(value) => patchResults(criteria.id, criteria.label, value)}
                 />
               ))}
-            <button type="button" className={classes.submitBtn} onClick={skipCharacter}>
-              Skip
-            </button>
           </div>
-
-          {showSubmitButton && (
-            <button type="button" onClick={handleSubmit} className={classes.submitBtn}>
-              Submit
-            </button>
-          )}
         </div>
         <div className={classes.avatar}>
           <ZoomImage url={selectedCharacter?.image || ''} />
