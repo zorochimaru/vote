@@ -42,6 +42,13 @@ h2 {
   padding: 10px;
 }
 
+.skipBtn {
+  border-radius: 8px;
+  background: rgb(255, 82, 82);
+  background: linear-gradient(90deg, rgb(208, 89, 89) 35%, rgb(182, 82, 82) 100%);
+  color: #fff;
+}
+
 .submitBtn:disabled {
   opacity: 0.5;
   color: initial;
@@ -51,18 +58,19 @@ h2 {
   color: initial;
 }
 
-.submitBtn {
-  float: right;
-  margin-top: 20px;
-  margin-right: 20px;
+button {
   border-radius: 8px;
   font-size: 1rem;
   outline: none;
   cursor: pointer;
-  background: rgb(89, 150, 208);
-  background: linear-gradient(90deg, rgba(89, 150, 208, 1) 35%, rgba(182, 82, 161, 1) 100%);
   font-family: BruceForever;
   padding: 10px 20px;
+}
+
+.submitBtn {
+  border-radius: 8px;
+  background: rgb(89, 150, 208);
+  background: linear-gradient(90deg, rgba(89, 150, 208, 1) 35%, rgba(182, 82, 161, 1) 100%);
   color: #fff;
 }
 
@@ -103,7 +111,7 @@ h2 {
 
 .avatar img {
   width: 100%;
-  max-height: 500px;
+  max-height: 450px;
   object-fit: contain;
 }
 

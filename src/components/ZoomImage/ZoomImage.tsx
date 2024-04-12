@@ -31,8 +31,8 @@ const ZoomImage: FunctionComponent<{ url: string }> = ({ url }) => {
         id={id}
         open={open}
         anchorOrigin={{
-          vertical: 'center',
-          horizontal: 'center'
+          vertical: 'top',
+          horizontal: 'left'
         }}
         anchorEl={anchorEl}
         onClose={handleClose}

@@ -33,6 +33,7 @@ export const useVote = <T extends CommonFirestoreWithOrder>(
   BasicLibFirestore[],
   (criteriaId: string, criteria: string, value: number) => void,
   boolean,
+  () => void,
   () => void
 ] => {
   const { user } = useUser();
@@ -163,13 +164,23 @@ export const useVote = <T extends CommonFirestoreWithOrder>(
         }
       } else {
         setRateResults(
-          (prev) =>
-            new Map(prev.set(selectedCharacter?.id || '', [{ criteriaId, value, criteria }]))
+          (prev) => new Map(prev.set(selectedCharacter!.id, [{ criteriaId, value, criteria }]))
         );
       }
     },
     [selectedCharacter, rateResults]
   );
+
+  const skipCharacter = useCallback(() => {
+    setRateResults((prev) =>
+      new Map(prev).set(
+        selectedCharacter!.id,
+        criteria.map((crit) => ({ criteriaId: crit.id, value: 0, criteria: crit.label }))
+      )
+    );
+    const nextChar = characters.find((c) => selectedCharacter!.orderNumber + 1 === c.orderNumber);
+    setCharacter(nextChar || characters[0]);
+  }, [setRateResults, selectedCharacter, criteria, characters, setCharacter]);
 
   useEffect(() => {
     fetchChars();
@@ -203,6 +214,7 @@ export const useVote = <T extends CommonFirestoreWithOrder>(
   }, [personsCollectionRef]);
 
   useEffect(() => {
+    console.log(rateResults);
     localStorage.setItem(`${personsCollectionRef.id}`, JSON.stringify([...rateResults]));
   }, [rateResults, personsCollectionRef]);
 
@@ -216,6 +228,7 @@ export const useVote = <T extends CommonFirestoreWithOrder>(
     criteria,
     patchResults,
     showSubmitButton,
-    handleSubmit
+    handleSubmit,
+    skipCharacter
   ];
 };

@@ -21,7 +21,8 @@ const KPopVote = () => {
     soloCosplayCriteria,
     patchResults,
     showSubmitButton,
-    handleSubmit
+    handleSubmit,
+    skipCharacter
   ] = useVote<KpopFirestore>(
     kPopTeamsCollectionRef,
     kPopTeamCriteriaCollectionRef,
@@ -42,6 +43,9 @@ const KPopVote = () => {
                 onChange={(value) => patchResults(criteria.id, criteria.label, value)}
               />
             ))}
+            <button type="button" className={classes.submitBtn} onClick={skipCharacter}>
+              Skip
+            </button>
           </div>
 
           {showSubmitButton && (

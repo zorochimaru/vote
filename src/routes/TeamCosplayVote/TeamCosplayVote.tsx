@@ -22,7 +22,8 @@ const TeamCosplayVote = () => {
     soloCosplayCriteria,
     patchResults,
     showSubmitButton,
-    handleSubmit
+    handleSubmit,
+    skipCharacter
   ] = useVote<TeamFirestore>(
     cosplayTeamsCollectionRef,
     cosplayTeamCriteriaCollectionRef,
@@ -33,7 +34,16 @@ const TeamCosplayVote = () => {
     <div className={classes.wrapper}>
       <div className={classes.descWrapper}>
         <div className={classes.rating}>
-          <h2>Rating</h2>
+          <h2>Rating</h2>{' '}
+          {showSubmitButton ? (
+            <button type="button" onClick={handleSubmit} className={classes.submitBtn}>
+              Submit
+            </button>
+          ) : (
+            <button type="button" className={classes.skipBtn} onClick={skipCharacter}>
+              Skip 🙅‍♂️
+            </button>
+          )}
           <div className={classes.questionsWrapper}>
             {soloCosplayCriteria?.map((criteria) => (
               <CriteriaList
@@ -44,12 +54,6 @@ const TeamCosplayVote = () => {
               />
             ))}
           </div>
-
-          {showSubmitButton && (
-            <button type="button" onClick={handleSubmit} className={classes.submitBtn}>
-              Submit
-            </button>
-          )}
         </div>
         <div className={classes.avatar}>
           <ZoomImage url={selectedCharacter?.image || ''} />

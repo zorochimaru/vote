@@ -22,7 +22,8 @@ const SoloCosplayVote = () => {
     soloCosplayCriteria,
     patchResults,
     showSubmitButton,
-    handleSubmit
+    handleSubmit,
+    skipCharacter
   ] = useVote<CharacterFirestore>(
     soloCosplayPersonsCollectionRef,
     soloCosplayCriteriaCollectionRef,
@@ -45,6 +46,9 @@ const SoloCosplayVote = () => {
                   onChange={(value) => patchResults(criteria.id, criteria.label, value)}
                 />
               ))}
+            <button type="button" className={classes.submitBtn} onClick={skipCharacter}>
+              Skip
+            </button>
           </div>
 
           {showSubmitButton && (
