@@ -6,4 +6,5 @@ export interface AuthUser {
   soloCosplayFinished?: boolean;
   teamCosplayFinished?: boolean;
   kPopFinished?: boolean;
+  teamKPopFinished?: boolean;
 }

@@ -10,6 +10,7 @@ import { ConfirmProvider } from 'material-ui-confirm';
 import { auth, userDocumentRef } from '../firebase';
 import Loading from './components/Loading/Loading';
 import { AuthUser } from './interfaces';
+import TeamKPopVote from './routes/TeamKPopVote/TeamKPopVote';
 
 const KPopVote = lazy(() => import('./routes/KPopVote/KPopVote'));
 const TeamCosplayVote = lazy(() => import('./routes/TeamCosplayVote/TeamCosplayVote'));
@@ -63,6 +64,7 @@ export const App = () => {
                     <Route index element={<Home />} />
                     <Route path="solo-cosplay-vote" element={<SoloCosplayVote />} />
                     <Route path="team-cosplay-vote" element={<TeamCosplayVote />} />
+                    <Route path="team-k-pop-vote" element={<TeamKPopVote />} />
                     <Route path="k-pop-vote" element={<KPopVote />} />
                     <Route path="results" element={<Results />} />
                     <Route path="admin-panel" element={<AdminPanel />} />

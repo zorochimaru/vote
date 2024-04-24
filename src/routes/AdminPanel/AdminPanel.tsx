@@ -19,13 +19,24 @@ import {
   RadioGroup,
   TextField
 } from '@mui/material';
-import { addDoc, deleteDoc, serverTimestamp, updateDoc } from 'firebase/firestore';
+import {
+  CollectionReference,
+  DocumentData,
+  addDoc,
+  deleteDoc,
+  getDocs,
+  serverTimestamp,
+  updateDoc
+} from 'firebase/firestore';
 import { useConfirm } from 'material-ui-confirm';
 import {
   authUsersCollectionRef,
   cosplayTeamCriteriaCollectionRef,
   cosplayTeamResultsCollectionRef,
   cosplayTeamsCollectionRef,
+  kPopSoloCollectionRef,
+  kPopSoloCriteriaCollectionRef,
+  kPopSoloResultsCollectionRef,
   kPopTeamCriteriaCollectionRef,
   kPopTeamResultsCollectionRef,
   kPopTeamsCollectionRef,
@@ -87,37 +98,51 @@ const AdminPanel = () => {
     reader.readAsBinaryString(f);
   };
 
-  const uploadFile = () => {
-    const reqs = [];
-    let collection = soloCosplayPersonsCollectionRef;
-    switch (type) {
-      case FirestoreCollections.soloCosplayPersons:
-        collection = soloCosplayPersonsCollectionRef;
-        break;
-      case FirestoreCollections.cosplayTeams:
-        collection = cosplayTeamsCollectionRef;
-        break;
-      case FirestoreCollections.kPopTeams:
-        collection = kPopTeamsCollectionRef;
-        break;
+  const uploadFile = async () => {
+    try {
+      setLoading(true);
+      const reqs = [];
+      let collection: CollectionReference<DocumentData, DocumentData>;
+      switch (type) {
+        case FirestoreCollections.soloCosplayPersons:
+          collection = soloCosplayPersonsCollectionRef;
+          break;
+        case FirestoreCollections.cosplayTeams:
+          collection = cosplayTeamsCollectionRef;
+          break;
+        case FirestoreCollections.kPopTeams:
+          collection = kPopTeamsCollectionRef;
+          break;
+        case FirestoreCollections.kPopSolo:
+          collection = kPopSoloCollectionRef;
+          break;
+        default:
+          throw new Error('Unknown type');
+      }
 
-      default:
-        console.error('Unknown type');
-        break;
-    }
+      const oldDocs = await getDocs(collection);
 
-    for (const row of rows) {
-      reqs.push(
-        addDoc(collection, {
-          createdAt: serverTimestamp(),
-          createdBy: user?.id,
-          ...row
-        })
-      );
-    }
-    Promise.all(reqs).then(() => {
+      for (const doc of oldDocs.docs) {
+        await deleteDoc(doc.ref);
+      }
+
+      for (const row of rows) {
+        reqs.push(
+          addDoc(collection, {
+            createdAt: serverTimestamp(),
+            createdBy: user?.id,
+            ...row
+          })
+        );
+      }
+
+      await Promise.all(reqs);
       setRows([]);
-    });
+      setLoading(false);
+    } catch (error) {
+      setLoading(true);
+      throw new Error(JSON.stringify(error));
+    }
   };
 
   const resetResults = async () => {
@@ -127,6 +152,7 @@ const AdminPanel = () => {
       const soloResults = await getList<ResultFirestore>(soloCosplayResultsCollectionRef);
       const teamResults = await getList<ResultFirestore>(cosplayTeamResultsCollectionRef);
       const kpopResults = await getList<ResultFirestore>(kPopTeamResultsCollectionRef);
+      const soloKpopResults = await getList<ResultFirestore>(kPopSoloResultsCollectionRef);
       const users = await getList<AuthUser>(authUsersCollectionRef);
 
       for (const result of soloResults) {
@@ -138,14 +164,19 @@ const AdminPanel = () => {
       for (const result of kpopResults) {
         await deleteDoc(getDocumentRef(FirestoreCollections.kPopTeamResults, result.id));
       }
+      for (const result of soloKpopResults) {
+        await deleteDoc(getDocumentRef(FirestoreCollections.kPopSoloResults, result.id));
+      }
 
       for (const user of users) {
         await updateDoc(getDocumentRef(FirestoreCollections.authUsers, user.email), {
           soloCosplayFinished: false,
           teamCosplayFinished: false,
-          kPopFinished: false
+          kPopFinished: false,
+          teamKPopFinished: false
         });
       }
+
       setLoading(false);
     } catch (error) {
       setLoading(false);
@@ -166,6 +197,9 @@ const AdminPanel = () => {
           break;
         case FirestoreCollections.kPopTeamCriteria:
           collectionRef = kPopTeamCriteriaCollectionRef;
+          break;
+        case FirestoreCollections.kPopSoloCriteria:
+          collectionRef = kPopSoloCriteriaCollectionRef;
           break;
 
         default:
@@ -201,6 +235,9 @@ const AdminPanel = () => {
             break;
           case FirestoreCollections.kPopTeamCriteria:
             collectionRef = kPopTeamCriteriaCollectionRef;
+            break;
+          case FirestoreCollections.kPopSoloCriteria:
+            collectionRef = kPopSoloCriteriaCollectionRef;
             break;
 
           default:
@@ -289,7 +326,12 @@ const AdminPanel = () => {
               <FormControlLabel
                 value={FirestoreCollections.kPopTeams}
                 control={<Radio />}
-                label="K-Pop"
+                label="Team K-Pop"
+              />
+              <FormControlLabel
+                value={FirestoreCollections.kPopSolo}
+                control={<Radio />}
+                label="Solo K-Pop"
               />
             </RadioGroup>
           </FormControl>
@@ -338,7 +380,12 @@ const AdminPanel = () => {
             <FormControlLabel
               value={FirestoreCollections.kPopTeamCriteria}
               control={<Radio />}
-              label="K-Pop"
+              label="Team K-Pop"
+            />
+            <FormControlLabel
+              value={FirestoreCollections.kPopSoloCriteria}
+              control={<Radio />}
+              label="Solo K-Pop"
             />
           </RadioGroup>
         </FormControl>

@@ -1,5 +1,6 @@
 import {
   cosplayTeamResultsCollectionRef,
+  kPopSoloResultsCollectionRef,
   kPopTeamResultsCollectionRef,
   soloCosplayResultsCollectionRef
 } from '../../../firebase';
@@ -22,10 +23,16 @@ const Results = () => {
           <ResultsTable collectionRef={soloCosplayResultsCollectionRef} />
         </>
       )}
+      {(user?.role === 'kPop' || user?.role === 'admin') && user?.teamKPopFinished && (
+        <>
+          <h1>Team K-Pop Results:</h1>
+          <ResultsTable collectionRef={kPopTeamResultsCollectionRef} />
+        </>
+      )}
       {(user?.role === 'kPop' || user?.role === 'admin') && user?.kPopFinished && (
         <>
-          <h1>K-Pop Results:</h1>
-          <ResultsTable collectionRef={kPopTeamResultsCollectionRef} />
+          <h1>Solo K-Pop Results:</h1>
+          <ResultsTable collectionRef={kPopSoloResultsCollectionRef} />
         </>
       )}
     </>

@@ -56,3 +56,13 @@ export const kPopTeamResultsCollectionRef = collection(
   firestore,
   FirestoreCollections.kPopTeamResults
 );
+
+export const kPopSoloCollectionRef = collection(firestore, FirestoreCollections.kPopSolo);
+export const kPopSoloCriteriaCollectionRef = collection(
+  firestore,
+  FirestoreCollections.kPopSoloCriteria
+);
+export const kPopSoloResultsCollectionRef = collection(
+  firestore,
+  FirestoreCollections.kPopSoloResults
+);

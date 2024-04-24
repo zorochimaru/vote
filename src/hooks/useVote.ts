@@ -122,8 +122,11 @@ export const useVote = <T extends CommonFirestoreWithOrder>(
         case FirestoreCollections.cosplayTeams:
           await updateDoc(userDocumentRef(user!.id), { teamCosplayFinished: true });
           break;
-        case FirestoreCollections.kPopTeams:
+        case FirestoreCollections.kPopSolo:
           await updateDoc(userDocumentRef(user!.id), { kPopFinished: true });
+          break;
+        case FirestoreCollections.kPopTeams:
+          await updateDoc(userDocumentRef(user!.id), { teamKPopFinished: true });
           break;
         default:
           break;

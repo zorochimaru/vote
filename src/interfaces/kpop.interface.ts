@@ -1,5 +1,5 @@
 export interface Kpop {
   name: string;
-  personCount: number;
+  personCount?: number;
   orderNumber: number;
 }

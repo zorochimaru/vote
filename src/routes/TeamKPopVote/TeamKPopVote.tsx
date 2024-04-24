@@ -1,7 +1,7 @@
 import {
-  kPopSoloCollectionRef,
-  kPopSoloCriteriaCollectionRef,
-  kPopSoloResultsCollectionRef
+  kPopTeamCriteriaCollectionRef,
+  kPopTeamResultsCollectionRef,
+  kPopTeamsCollectionRef
 } from '../../../firebase';
 import CharachterPick from '../../components/CharachterPick/CharachterPick';
 import CriteriaList from '../../components/CriteriaList/CriteriaList';
@@ -10,7 +10,7 @@ import { useVote } from '../../hooks/useVote';
 import { KpopFirestore } from '../../interfaces/kpop-firestore.interface';
 import classes from '../../styles/vote-page.module.css';
 
-const KPopVote = () => {
+const TeamKPopVote = () => {
   const [
     characters,
     selectedCharachter,
@@ -24,9 +24,9 @@ const KPopVote = () => {
     handleSubmit,
     skipCharacter
   ] = useVote<KpopFirestore>(
-    kPopSoloCollectionRef,
-    kPopSoloCriteriaCollectionRef,
-    kPopSoloResultsCollectionRef
+    kPopTeamsCollectionRef,
+    kPopTeamCriteriaCollectionRef,
+    kPopTeamResultsCollectionRef
   );
 
   return (
@@ -61,6 +61,7 @@ const KPopVote = () => {
           <h2>Description</h2>
 
           <InfoRow label="Name" value={selectedCharachter?.name || ''} />
+          <InfoRow label="Person Count" value={selectedCharachter?.personCount || 0} />
         </div>
       </div>
 
@@ -79,4 +80,4 @@ const KPopVote = () => {
   );
 };
 
-export default KPopVote;
+export default TeamKPopVote;
