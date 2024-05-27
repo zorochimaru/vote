@@ -29,20 +29,20 @@ const Home = () => {
         </>
       )}
 
-      {(user?.role === 'kPop' || user?.role === 'admin') && !user.kPopFinished && (
+      {/* {(user?.role === 'kPop' || user?.role === 'admin') && !user.kPopFinished && (
         <Link to="/k-pop-vote">
           <div className={classes.voteItem}>
             <Icon size={40} icon="note" />
-            <p>K-Pop Vote</p>
+            <p>Solo K-Pop Vote</p>
           </div>
         </Link>
-      )}
+      )} */}
 
       {(user?.role === 'kPop' || user?.role === 'admin') && !user.teamKPopFinished && (
         <Link to="/team-k-pop-vote">
           <div className={classes.voteItem}>
             <Icon size={40} icon="notes" />
-            <p>Team K-Pop Vote</p>
+            <p>K-Pop Vote</p>
           </div>
         </Link>
       )}

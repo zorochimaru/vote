@@ -326,13 +326,13 @@ const AdminPanel = () => {
               <FormControlLabel
                 value={FirestoreCollections.kPopTeams}
                 control={<Radio />}
-                label="Team K-Pop"
+                label="K-Pop"
               />
-              <FormControlLabel
+              {/* <FormControlLabel
                 value={FirestoreCollections.kPopSolo}
                 control={<Radio />}
                 label="Solo K-Pop"
-              />
+              /> */}
             </RadioGroup>
           </FormControl>
         </div>
@@ -380,13 +380,13 @@ const AdminPanel = () => {
             <FormControlLabel
               value={FirestoreCollections.kPopTeamCriteria}
               control={<Radio />}
-              label="Team K-Pop"
+              label="K-Pop"
             />
-            <FormControlLabel
+            {/* <FormControlLabel
               value={FirestoreCollections.kPopSoloCriteria}
               control={<Radio />}
               label="Solo K-Pop"
-            />
+            /> */}
           </RadioGroup>
         </FormControl>
         <Button onClick={fetchCriteria}>Fetch criteria</Button>
