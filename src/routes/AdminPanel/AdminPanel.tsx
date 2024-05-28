@@ -95,7 +95,7 @@ const AdminPanel = () => {
       }));
       setRows(finalResult);
     };
-    reader.readAsBinaryString(f);
+    reader.readAsArrayBuffer(f);
   };
 
   const uploadFile = async () => {

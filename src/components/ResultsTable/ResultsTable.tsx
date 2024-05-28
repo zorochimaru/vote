@@ -1,6 +1,7 @@
 import { CollectionReference, DocumentData } from 'firebase/firestore';
 import { useCallback, useEffect, useState } from 'react';
 import EnhancedTable from '../../components/EnhancedTable/EnhancedTable';
+import { VoteTypes } from '../../interfaces';
 import { ResultFirestore } from '../../interfaces/result-firestore.interface';
 import { HeadCell } from '../../interfaces/table-header-cell.interface';
 import { getList } from '../../services/firestore.service';
@@ -12,6 +13,7 @@ interface Result {
 
 interface TableRow {
   name: string;
+  personId: string;
   [criteriaId: string]: number | string;
   summary: number;
 }
@@ -21,9 +23,11 @@ interface GroupedResults {
 }
 
 const ResultsTable = ({
-  collectionRef
+  collectionRef,
+  type
 }: {
   collectionRef: CollectionReference<DocumentData, DocumentData>;
+  type: VoteTypes;
 }) => {
   const [results, setResults] = useState<ResultFirestore[]>([]);
   const [rows, setRows] = useState<TableRow[]>([]);
@@ -85,29 +89,29 @@ const ResultsTable = ({
     if (results.length) {
       // Use array.reduce to create the grouped object
       const grouped: GroupedResults = results.reduce((acc, cur) => {
-        const personNickname = cur.personNickname;
-
-        if (!acc[personNickname]) {
-          acc[personNickname] = {};
+        const personId = cur.personId;
+        if (!acc[personId]) {
+          acc[personId] = {};
         }
 
         for (const result of cur.results) {
           const { criteriaId, value } = result;
 
-          if (!acc[personNickname][criteriaId]) {
-            acc[personNickname][criteriaId] = 0;
+          if (!acc[personId][criteriaId]) {
+            acc[personId][criteriaId] = 0;
           }
 
-          acc[personNickname][criteriaId] += value;
+          acc[personId][criteriaId] += value;
         }
 
         return acc;
       }, {} as GroupedResults);
 
       // Use Object.entries and array.map to create the table array
-      const table: TableRow[] = Object.entries(grouped).map(([name, criteriaValues]) => {
+      const table: TableRow[] = Object.entries(grouped).map(([id, criteriaValues]) => {
         const row: TableRow = {
-          name,
+          personId: id,
+          name: results.find((r) => r.personId === id)?.personNickname || '',
           summary: 0
         };
 
@@ -132,7 +136,7 @@ const ResultsTable = ({
     generateRows();
   }, [generateHeaders, generateRows]);
 
-  return <EnhancedTable headCells={headCell} rows={rows} />;
+  return <EnhancedTable type={type} headCells={headCell} rows={rows} />;
 };
 
 export default ResultsTable;

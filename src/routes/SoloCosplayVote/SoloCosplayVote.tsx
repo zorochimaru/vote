@@ -62,6 +62,9 @@ const SoloCosplayVote = () => {
         </div>
         <div className={classes.info}>
           <h2>Description</h2>
+          <InfoRow label="Registration type" value={selectedCharacter?.registrationType || ''} />
+          <InfoRow label="Cosplayer name" value={selectedCharacter?.name || ''} />
+          <InfoRow label="Character name" value={selectedCharacter?.characterName || ''} />
           <InfoRow label="Name" value={selectedCharacter?.name || ''} />
           <InfoRow label="Fandom" value={selectedCharacter?.fandom || ''} />
           <InfoRow label="Fandom Type" value={selectedCharacter?.fandomType || ''} />
