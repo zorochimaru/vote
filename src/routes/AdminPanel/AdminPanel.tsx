@@ -70,7 +70,8 @@ const AdminPanel = () => {
   const [criteriaLabel, setCriteriaLabel] = useState('');
   const [criteriaList, setCriteriaList] = useState<BasicLibFirestore[]>([]);
   const [updatedCriteriaId, setUpdatedCriteriaId] = useState('');
-  const [rows, setRows] = useState<CommonVote[]>([]);
+  const [fileData, setFileData] = useState<CommonVote[]>([]);
+  const [rows, setRows] = useState<CommonFirestoreWithOrder[]>([]);
   const { user } = useUser();
 
   const { setLoading } = useLoading();
@@ -102,7 +103,8 @@ const AdminPanel = () => {
         ...x,
         orderNumber: i + 1
       }));
-      setRows(finalResult);
+
+      setFileData(finalResult);
     };
     reader.readAsArrayBuffer(f);
   };
@@ -135,7 +137,7 @@ const AdminPanel = () => {
         await deleteDoc(doc.ref);
       }
 
-      for (const row of rows) {
+      for (const row of fileData) {
         reqs.push(
           addDoc(collection, {
             createdAt: serverTimestamp(),
@@ -146,7 +148,7 @@ const AdminPanel = () => {
       }
 
       await Promise.all(reqs);
-      setRows([]);
+      fetchData();
       setLoading(false);
     } catch (error) {
       setLoading(true);
@@ -263,17 +265,17 @@ const AdminPanel = () => {
     if (!files) return;
 
     let collectionRef = soloCosplayPersonsCollectionRef;
-    switch (criteriaType) {
-      case FirestoreCollections.soloCosplayCriteria:
+    switch (type) {
+      case FirestoreCollections.soloCosplayPersons:
         collectionRef = soloCosplayPersonsCollectionRef;
         break;
-      case FirestoreCollections.cosplayTeamCriteria:
+      case FirestoreCollections.cosplayTeams:
         collectionRef = cosplayTeamsCollectionRef;
         break;
-      case FirestoreCollections.kPopTeamCriteria:
+      case FirestoreCollections.kPopTeams:
         collectionRef = kPopTeamsCollectionRef;
         break;
-      case FirestoreCollections.kPopSoloCriteria:
+      case FirestoreCollections.kPopSolo:
         collectionRef = kPopSoloCollectionRef;
         break;
 
@@ -563,12 +565,12 @@ const AdminPanel = () => {
                     </TableCell>
                     <TableCell className={classes.alignRight} align="right">
                       <div className={classes.imageCell}>
-                        <ZoomImage url={row.image || ''} />
+                        <ZoomImage url={(row.image as string) || ''} />
                         {row.id && (
                           <Button component="label" color="secondary" variant="contained">
                             Change
                             <input
-                              onChange={(e) => changeImage(e, row.id!)}
+                              onChange={(e) => changeImage(e, row.id as string)}
                               style={{
                                 clip: 'rect(0 0 0 0)',
                                 clipPath: 'inset(50%)',
