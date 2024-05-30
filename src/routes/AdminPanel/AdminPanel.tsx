@@ -24,16 +24,19 @@ import {
   DocumentData,
   addDoc,
   deleteDoc,
+  doc,
   getDocs,
   serverTimestamp,
   updateDoc
 } from 'firebase/firestore';
+import { getDownloadURL, ref, uploadBytesResumable } from 'firebase/storage';
 import { useConfirm } from 'material-ui-confirm';
 import {
   authUsersCollectionRef,
   cosplayTeamCriteriaCollectionRef,
   cosplayTeamResultsCollectionRef,
   cosplayTeamsCollectionRef,
+  firestore,
   kPopSoloCollectionRef,
   kPopSoloCriteriaCollectionRef,
   kPopSoloResultsCollectionRef,
@@ -42,12 +45,19 @@ import {
   kPopTeamsCollectionRef,
   soloCosplayCriteriaCollectionRef,
   soloCosplayPersonsCollectionRef,
-  soloCosplayResultsCollectionRef
+  soloCosplayResultsCollectionRef,
+  storage
 } from '../../../firebase';
 import ZoomImage from '../../components/ZoomImage/ZoomImage';
 import { useUser } from '../../contexts/AuthContext';
 import { useLoading } from '../../contexts/LoadingContext';
-import { AuthUser, BasicLibFirestore, CommonVote, FirestoreCollections } from '../../interfaces';
+import {
+  AuthUser,
+  BasicLibFirestore,
+  CommonFirestoreWithOrder,
+  CommonVote,
+  FirestoreCollections
+} from '../../interfaces';
 import { ResultFirestore } from '../../interfaces/result-firestore.interface';
 import { getDocumentRef, getList } from '../../services/firestore.service';
 import classes from './admin-panel.module.css';
@@ -60,6 +70,8 @@ const AdminPanel = () => {
   const [criteriaLabel, setCriteriaLabel] = useState('');
   const [criteriaList, setCriteriaList] = useState<BasicLibFirestore[]>([]);
   const [updatedCriteriaId, setUpdatedCriteriaId] = useState('');
+  const [rows, setRows] = useState<CommonVote[]>([]);
+  const { user } = useUser();
 
   const { setLoading } = useLoading();
   const confirm = useConfirm();
@@ -71,9 +83,6 @@ const AdminPanel = () => {
   const handleCriteriaTypeChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setCriteriaType((event.target as HTMLInputElement).value as FirestoreCollections);
   };
-
-  const [rows, setRows] = useState<CommonVote[]>([]);
-  const { user } = useUser();
 
   const loadFile = (event: React.ChangeEvent<HTMLInputElement>) => {
     const f = event.target.files?.[0];
@@ -216,6 +225,85 @@ const AdminPanel = () => {
     }
   };
 
+  const fetchData = async () => {
+    try {
+      setLoading(true);
+      let collectionRef = soloCosplayPersonsCollectionRef;
+      switch (type) {
+        case FirestoreCollections.soloCosplayPersons:
+          collectionRef = soloCosplayPersonsCollectionRef;
+          break;
+        case FirestoreCollections.cosplayTeams:
+          collectionRef = cosplayTeamsCollectionRef;
+          break;
+        case FirestoreCollections.kPopTeams:
+          collectionRef = kPopTeamsCollectionRef;
+          break;
+        case FirestoreCollections.kPopSolo:
+          collectionRef = kPopSoloCollectionRef;
+          break;
+
+        default:
+          console.error('Unknown type');
+          break;
+      }
+
+      const result = await getList<CommonFirestoreWithOrder>(collectionRef);
+      const sortedList = result.sort((a, b) => a.name.localeCompare(b.name));
+      setRows(sortedList);
+      setLoading(false);
+    } catch (error) {
+      setLoading(false);
+      console.error(error);
+    }
+  };
+
+  const changeImage = async (event: React.ChangeEvent<HTMLInputElement>, docId: string) => {
+    const files = event.target?.files;
+    if (!files) return;
+
+    let collectionRef = soloCosplayPersonsCollectionRef;
+    switch (criteriaType) {
+      case FirestoreCollections.soloCosplayCriteria:
+        collectionRef = soloCosplayPersonsCollectionRef;
+        break;
+      case FirestoreCollections.cosplayTeamCriteria:
+        collectionRef = cosplayTeamsCollectionRef;
+        break;
+      case FirestoreCollections.kPopTeamCriteria:
+        collectionRef = kPopTeamsCollectionRef;
+        break;
+      case FirestoreCollections.kPopSoloCriteria:
+        collectionRef = kPopSoloCollectionRef;
+        break;
+
+      default:
+        console.error('Unknown type');
+        break;
+    }
+    const storageRef = ref(storage, `${collectionRef.id}/${files[0].name}`);
+    const uploadTask = uploadBytesResumable(storageRef, files[0]);
+    try {
+      await uploadTask.on('state_changed', (snapshot) => {
+        switch (snapshot.state) {
+          case 'running':
+            setLoading(true);
+            break;
+          default:
+            setLoading(false);
+            break;
+        }
+      });
+      await uploadTask;
+      const downloadedURL = await getDownloadURL(uploadTask.snapshot.ref);
+      const documentRef = doc(firestore, collectionRef.path, docId);
+      await updateDoc(documentRef, { image: downloadedURL });
+      await fetchData();
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
   const saveCriteria = async () => {
     try {
       setLoading(true);
@@ -287,24 +375,34 @@ const AdminPanel = () => {
           alignItems: 'flex-start'
         }}>
         <div style={{ display: 'flex', gap: '16px', alignItems: 'flex-start' }}>
-          <Button component="label" variant="contained">
-            Browse file
-            <input
-              onChange={(e) => loadFile(e)}
-              style={{
-                clip: 'rect(0 0 0 0)',
-                clipPath: 'inset(50%)',
-                height: 1,
-                overflow: 'hidden',
-                position: 'absolute',
-                bottom: 0,
-                left: 0,
-                whiteSpace: 'nowrap',
-                width: 1
-              }}
-              type="file"
-            />
-          </Button>
+          <div
+            style={{
+              display: 'flex',
+              flexDirection: 'column',
+              gap: '16px'
+            }}>
+            <Button component="label" variant="contained">
+              Browse file
+              <input
+                onChange={(e) => loadFile(e)}
+                style={{
+                  clip: 'rect(0 0 0 0)',
+                  clipPath: 'inset(50%)',
+                  height: 1,
+                  overflow: 'hidden',
+                  position: 'absolute',
+                  bottom: 0,
+                  left: 0,
+                  whiteSpace: 'nowrap',
+                  width: 1
+                }}
+                type="file"
+              />
+            </Button>
+            <Button component="label" onClick={fetchData} variant="contained">
+              Fetch data
+            </Button>
+          </div>
           <FormControl>
             <FormLabel id="demo-radio-buttons-group-label">List Type</FormLabel>
             <RadioGroup
@@ -461,10 +559,32 @@ const AdminPanel = () => {
                     key={row.orderNumber}
                     sx={{ '&:last-child td, &:last-child th': { border: 0 } }}>
                     <TableCell component="th" scope="row">
-                      {row.name}
+                      <p className={classes.nameCell}>{row.name}</p>
                     </TableCell>
-                    <TableCell className={classes.imageCell} align="right">
-                      <ZoomImage url={row.image || ''} />
+                    <TableCell className={classes.alignRight} align="right">
+                      <div className={classes.imageCell}>
+                        <ZoomImage url={row.image || ''} />
+                        {row.id && (
+                          <Button component="label" color="secondary" variant="contained">
+                            Change
+                            <input
+                              onChange={(e) => changeImage(e, row.id!)}
+                              style={{
+                                clip: 'rect(0 0 0 0)',
+                                clipPath: 'inset(50%)',
+                                height: 1,
+                                overflow: 'hidden',
+                                position: 'absolute',
+                                bottom: 0,
+                                left: 0,
+                                whiteSpace: 'nowrap',
+                                width: 1
+                              }}
+                              type="file"
+                            />
+                          </Button>
+                        )}
+                      </div>
                     </TableCell>
                   </TableRow>
                 ))}

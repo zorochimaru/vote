@@ -1,3 +1,18 @@
-.imageCell img {
-  max-width: 100px;
+.imageCell {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  width: 100px;
+}
+
+.imageCell * {
+  width: 100%;
+}
+
+.nameCell {
+  font-size: 20px;
+}
+
+.alignRight {
+  display: flex;
 }
