@@ -1,3 +1,4 @@
+import { Button } from '@mui/material';
 import {
   cosplayTeamCriteriaCollectionRef,
   cosplayTeamResultsCollectionRef,
@@ -23,7 +24,9 @@ const TeamCosplayVote = () => {
     patchResults,
     showSubmitButton,
     handleSubmit,
-    skipCharacter
+    skipCharacter,
+    nextCharacter,
+    prevCharacter
   ] = useVote<TeamFirestore>(
     cosplayTeamsCollectionRef,
     cosplayTeamCriteriaCollectionRef,
@@ -35,15 +38,33 @@ const TeamCosplayVote = () => {
       <div className={classes.descWrapper}>
         <div className={classes.rating}>
           <h2>Rating</h2>{' '}
-          {showSubmitButton ? (
-            <button type="button" onClick={handleSubmit} className={classes.submitBtn}>
-              Submit
-            </button>
-          ) : (
-            <button type="button" className={classes.skipBtn} onClick={skipCharacter}>
-              Skip 🙅‍♂️
-            </button>
-          )}
+          <div className={classes.actionWrapper}>
+            {showSubmitButton ? (
+              <button type="button" onClick={handleSubmit} className={classes.submitBtn}>
+                Submit
+              </button>
+            ) : (
+              <button type="button" className={classes.skipBtn} onClick={skipCharacter}>
+                Skip 🙅‍♂️
+              </button>
+            )}
+            <div style={{ display: 'flex', gap: '30px' }}>
+              <Button
+                type="button"
+                style={{ paddingInline: '40px' }}
+                variant="contained"
+                onClick={prevCharacter}>
+                Prev
+              </Button>
+              <Button
+                type="button"
+                style={{ paddingInline: '40px' }}
+                variant="contained"
+                onClick={nextCharacter}>
+                Next
+              </Button>
+            </div>
+          </div>
           <div className={classes.questionsWrapper}>
             {soloCosplayCriteria?.map((criteria) => (
               <CriteriaList

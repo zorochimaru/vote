@@ -7,6 +7,12 @@
   container-name: wrapper;
 }
 
+.actionWrapper {
+  display: flex;
+  justify-content: space-between;
+  gap: 30px;
+}
+
 .outline {
   position: fixed;
   inset: 0;

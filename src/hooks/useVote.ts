@@ -34,6 +34,8 @@ export const useVote = <T extends CommonFirestoreWithOrder>(
   (criteriaId: string, criteria: string, value: number) => void,
   boolean,
   () => void,
+  () => void,
+  () => void,
   () => void
 ] => {
   const { user } = useUser();
@@ -185,6 +187,18 @@ export const useVote = <T extends CommonFirestoreWithOrder>(
     setCharacter(nextChar || characters[0]);
   }, [setRateResults, selectedCharacter, criteria, characters, setCharacter]);
 
+  const nextCharacter = useCallback(() => {
+    const nextChar = characters.find((c) => selectedCharacter!.orderNumber + 1 === c.orderNumber);
+    setCharacter(nextChar || characters[0]);
+    window.scrollTo(0, 0);
+  }, [selectedCharacter, characters, setCharacter]);
+
+  const prevCharacter = useCallback(() => {
+    const nextChar = characters.find((c) => selectedCharacter!.orderNumber - 1 === c.orderNumber);
+    setCharacter(nextChar || characters[0]);
+    window.scrollTo(0, 0);
+  }, [selectedCharacter, characters, setCharacter]);
+
   useEffect(() => {
     fetchChars();
     fetchCriteria();
@@ -231,6 +245,8 @@ export const useVote = <T extends CommonFirestoreWithOrder>(
     patchResults,
     showSubmitButton,
     handleSubmit,
-    skipCharacter
+    skipCharacter,
+    nextCharacter,
+    prevCharacter
   ];
 };
