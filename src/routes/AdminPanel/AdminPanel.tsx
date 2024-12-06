@@ -103,7 +103,6 @@ const AdminPanel = () => {
         ...x,
         orderNumber: i + 1
       }));
-
       setFileData(finalResult);
     };
     reader.readAsArrayBuffer(f);
@@ -251,7 +250,7 @@ const AdminPanel = () => {
       }
 
       const result = await getList<CommonFirestoreWithOrder>(collectionRef);
-      const sortedList = result.sort((a, b) => a.name.localeCompare(b.name));
+      const sortedList = result.sort((a, b) => a.orderNumber - b.orderNumber);
       setRows(sortedList);
       setLoading(false);
     } catch (error) {
@@ -440,7 +439,7 @@ const AdminPanel = () => {
           Reset Results
         </Button>
 
-        {!!rows.length && (
+        {!!fileData.length && (
           <Button
             onClick={uploadFile}
             variant="contained"
